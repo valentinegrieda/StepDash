@@ -10,6 +10,9 @@ struct StepDashApp: App {
                 ContentView()
             }
             .preferredColorScheme(.light)
+            .task {
+                BackgroundMusicPlayer.shared.startIfNeeded()
+            }
         }
         .modelContainer(for: [Player.self, Mission.self])
     }
