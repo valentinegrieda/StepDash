@@ -1,4 +1,5 @@
 import SpriteKit
+import SwiftUI
 import Foundation
 
 class GameScene: SKScene {
@@ -17,14 +18,17 @@ class GameScene: SKScene {
     let playerNameLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     let stepLabel  = SKLabelNode(fontNamed: "AvenirNext-Bold")
     let distanceLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    let bottomToolbar = SKNode()
 
     // MARK: - CONFIG
     var playerName: String
     var stepLength: Double
     var distance: Double = 0
+    var onToolbarItemSelected: ((String, Int, Double) -> Void)?
 
     // MARK: - STATE
     var lastStepCount: Int = 0
+    var activeToolbarItemID: String = "home"
 
     // MARK: - INIT
     init(size: CGSize, playerName: String, stepLength: Double) {
@@ -48,6 +52,7 @@ class GameScene: SKScene {
         setIdle()
         setupStepLabel()
         setupDistanceLabel()
+        setupBottomToolbar()
 
         motion.onStep = { [weak self] totalSteps in
             guard let self else { return }
@@ -73,59 +78,27 @@ class GameScene: SKScene {
 
         motion.start()
     }
-
     
-
-    
-
-    // MARK: - LABELS
-    func setupPlayerNameLabel() {
-
-        playerNameLabel.text = playerName
-        playerNameLabel.fontSize = 16
-        playerNameLabel.fontColor = .white
-        playerNameLabel.horizontalAlignmentMode = .center
-        playerNameLabel.verticalAlignmentMode = .bottom
-
-        playerNameLabel.position = CGPoint(
-            x: playerSprite.position.x,
-            y: playerSprite.position.y + playerSprite.size.height / 2 + 12
-        )
-        playerNameLabel.zPosition = 100
-
-        addChild(playerNameLabel)
-    }
-
-    func setupStepLabel() {
-
-        stepLabel.text = "Steps: 0"
-        stepLabel.fontSize = 14
-        stepLabel.fontColor = .white
-        stepLabel.horizontalAlignmentMode = .left
-        stepLabel.verticalAlignmentMode = .top
-
-        stepLabel.position = CGPoint(x: 20, y: size.height - 20)
-        stepLabel.zPosition = 100
-
-        addChild(stepLabel)
-    }
-
-    func setupDistanceLabel() {
-
-        distanceLabel.text = "Distance: 0"
-        distanceLabel.fontSize = 14
-        distanceLabel.fontColor = .white
-        distanceLabel.horizontalAlignmentMode = .left
-        distanceLabel.verticalAlignmentMode = .top
-
-        distanceLabel.position = CGPoint(x: 20, y: size.height - 40)
-        distanceLabel.zPosition = 100
-
-        addChild(distanceLabel)
-    }
 
     // MARK: - DEBUG
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if handleToolbarTouch(touches) {
+            return
+        }
+
         moveBackground(distance: 40)
     }
+}
+
+#Preview {
+    let scene = GameScene(
+        size: CGSize(width: 393, height: 852),
+        playerName: "Valentine",
+        stepLength: 0.7
+    )
+    scene.scaleMode = .resizeFill
+
+    return SpriteView(scene: scene)
+        .frame(width: 393, height: 852)
+        .ignoresSafeArea()
 }

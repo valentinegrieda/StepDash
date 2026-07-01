@@ -268,6 +268,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StepDash/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = StepDash;
 				INFOPLIST_KEY_NSMotionUsageDescription = "StepDash uses your motion data to count your steps and calculate the distance you walk";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -303,6 +304,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StepDash/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = StepDash;
 				INFOPLIST_KEY_NSMotionUsageDescription = "StepDash uses your motion data to count your steps and calculate the distance you walk";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

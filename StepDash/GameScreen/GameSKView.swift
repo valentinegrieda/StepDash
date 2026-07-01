@@ -7,10 +7,16 @@ final class GameSKView: SKView {
     
     let playerName: String
     let stepLength: Double
+    var onToolbarItemSelected: ((String, Int, Double) -> Void)?
 
-        init(playerName: String, stepLength: Double) {
+        init(
+            playerName: String,
+            stepLength: Double,
+            onToolbarItemSelected: ((String, Int, Double) -> Void)? = nil
+        ) {
             self.playerName = playerName
             self.stepLength = stepLength
+            self.onToolbarItemSelected = onToolbarItemSelected
             super.init(frame: .zero)
         }
 
@@ -32,6 +38,7 @@ final class GameSKView: SKView {
             playerName: playerName,
             stepLength: stepLength
         )
+        scene.onToolbarItemSelected = onToolbarItemSelected
         scene.scaleMode = .resizeFill
 
         presentScene(scene)
@@ -52,5 +59,10 @@ final class GameSKView: SKView {
 
     @objc private func moveBackground() {
         (scene as? GameScene)?.moveBackground()
+    }
+
+    func updateToolbarHandler(_ handler: ((String, Int, Double) -> Void)?) {
+        onToolbarItemSelected = handler
+        (scene as? GameScene)?.onToolbarItemSelected = handler
     }
 }

@@ -11,6 +11,6 @@ struct StepDashApp: App {
             }
             .preferredColorScheme(.light)
         }
-        .modelContainer(for: Player.self)
+        .modelContainer(for: [Player.self, Mission.self])
     }
 }

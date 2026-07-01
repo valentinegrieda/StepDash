@@ -51,6 +51,8 @@ struct ContentView: View {
                 GameContainerView(name: players[0].name, stepLength: players[0].stepLength)
             }
         }
+        .onAppear {
+            Mission.seedIfNeeded(context: modelContext)
+        }
     }
 }
-
