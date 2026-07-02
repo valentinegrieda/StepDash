@@ -53,11 +53,18 @@ struct ToolbarDestinationPresentation: Identifiable {
 struct ToolbarDestinationView: View {
     let destination: ToolbarDestination
     let playerName: String
+    /// Today's raw steps (resets at midnight).
     let steps: Int
+    /// Today's distance in meters.
     let distance: Double
+    /// Monotonic step count used for weekly-delivery progress.
+    var accumulatedSteps: Int = 0
+    var stepLength: Double = 0.7
     var onClose: () -> Void = {}
 
+    @Environment(\.modelContext) private var context
     @Query(sort: \Mission.id) private var missions: [Mission]
+    @Query private var players: [Player]
 
     var body: some View {
         ZStack {
@@ -101,20 +108,100 @@ struct ToolbarDestinationView: View {
         }
     }
 
+    // MARK: - Missions
+
     private var missionContent: some View {
         VStack(spacing: 10) {
             if missions.isEmpty {
                 toolbarRow(icon: "Map", title: "No Missions", detail: "Mission database is empty")
             } else {
                 ForEach(missions, id: \.id) { mission in
-                    toolbarRow(
-                        icon: missionIcon(for: mission.id),
-                        title: mission.title,
-                        detail: "\(mission.destination) • \(String(format: "%.1f", mission.distanceKm)) km • \(mission.rewardCoins) coins"
-                    )
+                    missionRow(mission)
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private func missionRow(_ mission: Mission) -> some View {
+        let progress = mission.progress(todaySteps: steps, accumulatedSteps: accumulatedSteps, stepLength: stepLength)
+
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 12) {
+                Image(missionIcon(for: mission.id))
+                    .resizable()
+                    .interpolation(.none)
+                    .scaledToFit()
+                    .frame(width: 38, height: 38)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(mission.title)
+                        .font(Pixel.font(15, weight: .heavy))
+                        .foregroundStyle(Pixel.ink)
+                    Text("\(mission.destination) • \(mission.goalDescription)")
+                        .font(Pixel.font(11, weight: .bold))
+                        .foregroundStyle(Pixel.textMuted)
+                }
+
+                Spacer()
+                categoryBadge(mission.category)
+            }
+
+            if mission.isCompleted {
+                HStack(spacing: 6) {
+                    Image(systemName: "checkmark.seal.fill")
+                        .foregroundStyle(Pixel.grass)
+                    Text("DELIVERED")
+                        .font(Pixel.font(12, weight: .heavy))
+                        .foregroundStyle(Pixel.grass)
+                    Spacer()
+                    rewardText(mission)
+                }
+            } else if mission.isAccepted {
+                DashboardBar(progress: progress, fill: Pixel.gem, height: 10)
+                HStack {
+                    Text(mission.progressDescription(todaySteps: steps, accumulatedSteps: accumulatedSteps, stepLength: stepLength))
+                        .font(Pixel.font(11, weight: .bold))
+                        .foregroundStyle(Pixel.textMuted)
+                    Spacer()
+                    rewardText(mission)
+                }
+            } else {
+                HStack {
+                    rewardText(mission)
+                    Spacer()
+                }
+                Button("ACCEPT DELIVERY") {
+                    mission.accept(now: Date(), accumulatedSteps: accumulatedSteps)
+                    try? context.save()
+                }
+                .buttonStyle(PixelButtonStyle(fill: Pixel.grass))
+            }
+        }
+        .padding(12)
+        .background(.white)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Pixel.panelEdge, lineWidth: 1.5))
+    }
+
+    private func categoryBadge(_ category: MissionCategory) -> some View {
+        Text(category == .daily ? "DAILY" : "WEEKLY")
+            .font(Pixel.font(10, weight: .heavy))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Capsule().fill(category == .daily ? Pixel.purple : Pixel.gem))
+    }
+
+    private func rewardText(_ mission: Mission) -> some View {
+        HStack(spacing: 8) {
+            Label("\(mission.rewardCoins)", systemImage: "dollarsign.circle.fill")
+                .foregroundStyle(Pixel.coin)
+            Label("\(mission.rewardXP)", systemImage: "star.fill")
+                .foregroundStyle(Pixel.purple)
+        }
+        .font(Pixel.font(12, weight: .heavy))
+        .labelStyle(.titleAndIcon)
     }
 
     private func missionIcon(for id: Int) -> String {
@@ -128,11 +215,37 @@ struct ToolbarDestinationView: View {
         }
     }
 
+    // MARK: - Stats
+
     private var statsContent: some View {
-        VStack(spacing: 14) {
+        let totals = DailyStepRecord.lifetimeTotals(context: context)
+
+        return VStack(spacing: 14) {
             statBlock(title: "TODAY", value: "\(steps) steps", progress: stepProgress)
             statBlock(title: "DISTANCE", value: "\(formattedDistance)m", progress: distanceProgress)
+
+            InsetCard {
+                totalRow(title: "TOTAL STEPS", value: "\(totals.steps)")
+                Divider()
+                totalRow(title: "TOTAL DISTANCE", value: String(format: "%.0f m", totals.distance))
+                Divider()
+                totalRow(title: "DELIVERIES DONE", value: "\(totals.deliveries)")
+            }
         }
+    }
+
+    private func totalRow(title: String, value: String) -> some View {
+        HStack {
+            Text(title)
+                .font(Pixel.font(12, weight: .heavy))
+                .foregroundStyle(Pixel.textMuted)
+            Spacer()
+            Text(value)
+                .font(Pixel.font(14, weight: .heavy))
+                .foregroundStyle(Pixel.ink)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
     }
 
     private var formattedDistance: String {
@@ -147,6 +260,8 @@ struct ToolbarDestinationView: View {
         min(distance / 8_000, 1)
     }
 
+    // MARK: - Shop
+
     private var shopContent: some View {
         VStack(spacing: 10) {
             toolbarRow(icon: "Shoe", title: "Speed Shoes", detail: "120 coins")
@@ -154,6 +269,8 @@ struct ToolbarDestinationView: View {
             toolbarRow(icon: "Gear", title: "Courier Gear", detail: "150 coins")
         }
     }
+
+    // MARK: - Profile
 
     private var profileContent: some View {
         VStack(spacing: 12) {
@@ -168,9 +285,12 @@ struct ToolbarDestinationView: View {
                 .foregroundStyle(Pixel.ink)
 
             toolbarRow(icon: "Badge", title: "Courier Rank", detail: "Starter")
-            toolbarRow(icon: "Coin", title: "Coins", detail: "0")
+            toolbarRow(icon: "Coin", title: "Coins", detail: "\(players.first?.coins ?? 0)")
+            toolbarRow(icon: "Stat", title: "XP", detail: "\(players.first?.xp ?? 0)")
         }
     }
+
+    // MARK: - Shared
 
     private func toolbarRow(icon: String, title: String, detail: String) -> some View {
         HStack(spacing: 12) {
@@ -220,10 +340,12 @@ struct ToolbarDestinationView: View {
 
 #Preview("Toolbar Destination") {
     ToolbarDestinationView(
-        destination: .stats,
+        destination: .missions,
         playerName: "Valentine",
         steps: 7245,
-        distance: 5120.45
+        distance: 5120.45,
+        accumulatedSteps: 7245,
+        stepLength: 0.7
     )
-    .modelContainer(for: [Mission.self], inMemory: true)
+    .modelContainer(for: [Mission.self, Player.self, DailyStepRecord.self], inMemory: true)
 }

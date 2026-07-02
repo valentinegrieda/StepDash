@@ -25,6 +25,8 @@ class GameScene: SKScene {
     var stepLength: Double
     var distance: Double = 0
     var onToolbarItemSelected: ((String, Int, Double) -> Void)?
+    /// Forwards each pedometer update to SwiftUI: `(todaySteps, accumulatedSteps, todayDistance)`.
+    var onStepUpdate: ((Int, Int, Double) -> Void)?
 
     // MARK: - STATE
     var lastStepCount: Int = 0
@@ -54,31 +56,34 @@ class GameScene: SKScene {
         setupDistanceLabel()
         setupBottomToolbar()
 
-        motion.onStep = { [weak self] totalSteps in
+        motion.onStep = { [weak self] todaySteps, accumulatedSteps in
             guard let self else { return }
-            
+
             DispatchQueue.main.async {
-                
-                self.stepLabel.text = "Steps: \(totalSteps)"
-                
-                self.distance = self.stepLength * Double(totalSteps)
-                
+
+                self.stepLabel.text = "Steps: \(todaySteps)"
+
+                self.distance = self.stepLength * Double(todaySteps)
+
                 self.distanceLabel.text =
                 "Distance: \(String(format: "%.2f", self.distance))m"
-                
+
                 // 🔥 STEP EDGE DETECTION (ONLY NEW STEP TRIGGERS GAME)
-                if totalSteps > self.lastStepCount {
-                    
+                if todaySteps > self.lastStepCount {
+
                     self.onStepTriggered()
                 }
-                
-                self.lastStepCount = totalSteps
+
+                self.lastStepCount = todaySteps
+
+                // Forward to SwiftUI for mission progress + daily stats.
+                self.onStepUpdate?(todaySteps, accumulatedSteps, self.distance)
             }
         }
 
         motion.start()
     }
-    
+
 
     // MARK: - DEBUG
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

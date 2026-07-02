@@ -14,6 +14,6 @@ struct StepDashApp: App {
                 BackgroundMusicPlayer.shared.startIfNeeded()
             }
         }
-        .modelContainer(for: [Player.self, Mission.self])
+        .modelContainer(for: [Player.self, Mission.self, DailyStepRecord.self])
     }
 }

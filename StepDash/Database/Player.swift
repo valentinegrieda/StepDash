@@ -7,12 +7,15 @@ final class Player {
     var gender: String
     var height: Int
     var stepLength: Double
+    var coins: Int = 0
+    var xp: Int = 0
 
-    init(name: String, gender: String, height: Int, stepLength: Double) {
+    init(name: String, gender: String, height: Int, stepLength: Double, coins: Int = 0, xp: Int = 0) {
         self.name = name
         self.gender = gender
         self.height = height
         self.stepLength = stepLength
-        
+        self.coins = coins
+        self.xp = xp
     }
 }
