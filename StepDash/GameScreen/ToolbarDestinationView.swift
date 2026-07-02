@@ -41,8 +41,6 @@ struct ToolbarDestinationView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 14) {
-                    topSummary
-
                     DashboardPanel(title: destination.title) {
                         VStack(spacing: 10) {
                             destinationContent
@@ -61,73 +59,6 @@ struct ToolbarDestinationView: View {
             }
             .ignoresSafeArea(.keyboard, edges: .bottom)
         }
-    }
-
-    private var topSummary: some View {
-        GeometryReader { proxy in
-            let availableWidth = proxy.size.width
-            let playerCardWidth = TopSummaryMetrics.playerCardWidth(for: availableWidth)
-            let stepCardWidth = TopSummaryMetrics.stepCardWidth(for: availableWidth)
-
-            HStack(spacing: TopSummaryMetrics.gap) {
-                HStack(spacing: 10) {
-                    Image(GameUIConfig.playerIconName)
-                        .resizable()
-                        .interpolation(.none)
-                        .scaledToFit()
-                        .frame(
-                            width: TopSummaryMetrics.iconSide,
-                            height: TopSummaryMetrics.iconSide
-                        )
-
-                    Text(playerName.uppercased())
-                        .font(Pixel.font(TopSummaryMetrics.playerTextSize, weight: .heavy))
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-                }
-                .padding(TopSummaryMetrics.contentPadding)
-                .frame(width: playerCardWidth, height: TopSummaryMetrics.cardHeight)
-                .background(
-                    RoundedRectangle(cornerRadius: TopSummaryMetrics.cornerRadius)
-                        .fill(Pixel.navy.opacity(0.96))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: TopSummaryMetrics.cornerRadius)
-                        .strokeBorder(.white.opacity(0.12), lineWidth: 1)
-                )
-
-                HStack(spacing: 10) {
-                    Image(GameUIConfig.stepsIconName)
-                        .resizable()
-                        .interpolation(.none)
-                        .scaledToFit()
-                        .frame(
-                            width: TopSummaryMetrics.iconSide,
-                            height: TopSummaryMetrics.iconSide
-                        )
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(GameUIConfig.stepsTitle)
-                            .font(Pixel.font(TopSummaryMetrics.stepsTitleSize, weight: .bold))
-                            .foregroundStyle(Pixel.textMuted)
-                        Text("\(steps)")
-                            .font(Pixel.font(TopSummaryMetrics.stepsValueSize, weight: .heavy))
-                            .foregroundStyle(Pixel.ink)
-                    }
-                }
-                .padding(TopSummaryMetrics.contentPadding)
-                .frame(width: stepCardWidth, height: TopSummaryMetrics.cardHeight)
-                .background(
-                    RoundedRectangle(cornerRadius: TopSummaryMetrics.cornerRadius)
-                        .fill(.white)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: TopSummaryMetrics.cornerRadius)
-                        .strokeBorder(Pixel.panelEdge, lineWidth: 1.5)
-                )
-            }
-        }
-        .frame(height: TopSummaryMetrics.cardHeight)
     }
 
     @ViewBuilder

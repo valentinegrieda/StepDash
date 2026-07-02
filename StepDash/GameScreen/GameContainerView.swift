@@ -14,7 +14,10 @@ struct GameContainerView: View {
     @State private var todaySteps = 0
     @State private var accumulatedSteps = 0
 
-    private var todayDistance: Double { Double(todaySteps) * stepLength }
+    private var databasePlayer: Player? { players.first }
+    private var playerName: String { databasePlayer?.name ?? name }
+    private var playerStepLength: Double { databasePlayer?.stepLength ?? stepLength }
+    private var todayDistance: Double { Double(todaySteps) * playerStepLength }
 
     var body: some View {
         Group {
@@ -24,11 +27,11 @@ struct GameContainerView: View {
                 ToolbarDestinationView(
                     destination: selectedDestination,
                     selectedDestination: selectedDestination,
-                    playerName: name,
+                    playerName: playerName,
                     steps: todaySteps,
                     distance: todayDistance,
                     accumulatedSteps: accumulatedSteps,
-                    stepLength: stepLength,
+                    stepLength: playerStepLength,
                     onSelect: selectDestination
                 )
             }
@@ -39,8 +42,8 @@ struct GameContainerView: View {
 
     private var homeScene: some View {
         GameSceneRepresentable(
-            name: name,
-            stepLength: stepLength,
+            name: playerName,
+            stepLength: playerStepLength,
             activeToolbarItemID: selectedDestination.rawValue,
             onToolbarItemSelected: { itemId, steps, _ in
                 todaySteps = steps
@@ -51,6 +54,7 @@ struct GameContainerView: View {
                 handleStep(today: today, accumulated: accumulated)
             }
         )
+        .id(playerName)
         .ignoresSafeArea()
     }
 
@@ -61,7 +65,7 @@ struct GameContainerView: View {
         accumulatedSteps = accumulated
 
         let record = DailyStepRecord.record(for: Date(), context: context)
-        let distance = Double(today) * stepLength
+        let distance = Double(today) * playerStepLength
         if record.steps != today { record.steps = today }
         if record.distance != distance { record.distance = distance }
 
@@ -72,7 +76,7 @@ struct GameContainerView: View {
             mission.refreshPeriod(now: now)
             guard mission.isAccepted, !mission.isCompleted else { continue }
 
-            if mission.isReached(todaySteps: today, accumulatedSteps: accumulated, stepLength: stepLength) {
+            if mission.isReached(todaySteps: today, accumulatedSteps: accumulated, stepLength: playerStepLength) {
                 mission.isCompleted = true
                 completedNow += 1
 
