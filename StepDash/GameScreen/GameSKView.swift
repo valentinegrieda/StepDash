@@ -7,25 +7,28 @@ final class GameSKView: SKView {
 
     let playerName: String
     let stepLength: Double
+    var activeToolbarItemID: String
     var onToolbarItemSelected: ((String, Int, Double) -> Void)?
     var onStepUpdate: ((Int, Int, Double) -> Void)?
 
-        init(
-            playerName: String,
-            stepLength: Double,
-            onToolbarItemSelected: ((String, Int, Double) -> Void)? = nil,
-            onStepUpdate: ((Int, Int, Double) -> Void)? = nil
-        ) {
-            self.playerName = playerName
-            self.stepLength = stepLength
-            self.onToolbarItemSelected = onToolbarItemSelected
-            self.onStepUpdate = onStepUpdate
-            super.init(frame: .zero)
-        }
+    init(
+        playerName: String,
+        stepLength: Double,
+        activeToolbarItemID: String = "home",
+        onToolbarItemSelected: ((String, Int, Double) -> Void)? = nil,
+        onStepUpdate: ((Int, Int, Double) -> Void)? = nil
+    ) {
+        self.playerName = playerName
+        self.stepLength = stepLength
+        self.activeToolbarItemID = activeToolbarItemID
+        self.onToolbarItemSelected = onToolbarItemSelected
+        self.onStepUpdate = onStepUpdate
+        super.init(frame: .zero)
+    }
 
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override var canBecomeFirstResponder: Bool {
         return true
@@ -43,6 +46,7 @@ final class GameSKView: SKView {
         )
         scene.onToolbarItemSelected = onToolbarItemSelected
         scene.onStepUpdate = onStepUpdate
+        scene.activeToolbarItemID = activeToolbarItemID
         scene.scaleMode = .resizeFill
 
         presentScene(scene)
@@ -73,5 +77,14 @@ final class GameSKView: SKView {
     func updateStepHandler(_ handler: ((Int, Int, Double) -> Void)?) {
         onStepUpdate = handler
         (scene as? GameScene)?.onStepUpdate = handler
+    }
+
+    func updateActiveToolbarItem(_ itemID: String) {
+        activeToolbarItemID = itemID
+        guard let gameScene = scene as? GameScene,
+              gameScene.activeToolbarItemID != itemID else { return }
+
+        gameScene.activeToolbarItemID = itemID
+        gameScene.setupBottomToolbar()
     }
 }

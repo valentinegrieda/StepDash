@@ -8,20 +8,8 @@
 import SpriteKit
 
 extension GameScene {
-    private struct ToolbarItem {
-        let id: String
-        let iconAsset: String
-        let title: String
-    }
-
-    private var toolbarItems: [ToolbarItem] {
-        [
-            ToolbarItem(id: "home", iconAsset: "Home", title: "HOME"),
-            ToolbarItem(id: "missions", iconAsset: "List", title: "MISSIONS"),
-            ToolbarItem(id: "stats", iconAsset: "Stat", title: "STATS"),
-            ToolbarItem(id: "shop", iconAsset: "Cart", title: "SHOP"),
-            ToolbarItem(id: "profile", iconAsset: "Head1", title: "PROFILE")
-        ]
+    private var toolbarItems: [GameToolbarItem] {
+        GameUIConfig.toolbarItems
     }
 
     func setupBottomToolbar() {
@@ -30,10 +18,12 @@ extension GameScene {
         bottomToolbar.zPosition = 250
 
         let safeBottom = view?.safeAreaInsets.bottom ?? 0
-        let horizontalPadding: CGFloat = 16
-        let toolbarHeight: CGFloat = 82
-        let toolbarWidth = min(size.width - horizontalPadding * 2, 560)
-        let toolbarY = safeBottom + toolbarHeight / 2 + 14
+        let toolbarHeight = ToolbarMetrics.toolbarHeight
+        let toolbarWidth = min(
+            size.width - ToolbarMetrics.horizontalPadding * 2,
+            ToolbarMetrics.maxToolbarWidth
+        )
+        let toolbarY = safeBottom + toolbarHeight / 2 + ToolbarMetrics.bottomPadding
 
         bottomToolbar.position = CGPoint(x: size.width / 2, y: toolbarY)
 
@@ -56,7 +46,10 @@ extension GameScene {
             let button = makeToolbarButton(
                 item: item,
                 isSelected: isSelected,
-                size: CGSize(width: itemWidth - 8, height: toolbarHeight - 18)
+                size: CGSize(
+                    width: itemWidth - ToolbarMetrics.itemHorizontalInset * 2,
+                    height: ToolbarMetrics.buttonHeight
+                )
             )
 
             button.position = CGPoint(
@@ -71,7 +64,7 @@ extension GameScene {
         }
     }
 
-    private func makeToolbarButton(item: ToolbarItem, isSelected: Bool, size: CGSize) -> SKNode {
+    private func makeToolbarButton(item: GameToolbarItem, isSelected: Bool, size: CGSize) -> SKNode {
         let button = SKNode()
         button.name = "toolbar_\(item.id)"
         button.zPosition = 1
@@ -86,8 +79,11 @@ extension GameScene {
             button.addChild(activeBackground)
         }
 
-        let iconNode = SKSpriteNode(imageNamed: item.iconAsset)
-        iconNode.size = fittedIconSize(for: iconNode.texture, maxSide: isSelected ? 36 : 32)
+        let iconNode = SKSpriteNode(imageNamed: item.iconName)
+        iconNode.size = fittedIconSize(
+            for: iconNode.texture,
+            maxSide: isSelected ? ToolbarMetrics.selectedIconSide : ToolbarMetrics.iconSide
+        )
         iconNode.position = CGPoint(x: 0, y: 10)
         iconNode.name = button.name
         iconNode.zPosition = 1
@@ -95,7 +91,7 @@ extension GameScene {
 
         let titleLabel = SKLabelNode(fontNamed: "AvenirNext-Heavy")
         titleLabel.text = item.title
-        titleLabel.fontSize = 12
+        titleLabel.fontSize = ToolbarMetrics.titleFontSize
         titleLabel.fontColor = isSelected ? .yellow : .white
         titleLabel.verticalAlignmentMode = .center
         titleLabel.horizontalAlignmentMode = .center

@@ -60,9 +60,7 @@ class GameScene: SKScene {
             guard let self else { return }
 
             DispatchQueue.main.async {
-
-                self.stepLabel.text = "Steps: \(todaySteps)"
-
+                self.stepLabel.text = "\(todaySteps)"
                 self.distance = self.stepLength * Double(todaySteps)
 
                 self.distanceLabel.text =

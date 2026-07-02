@@ -7,41 +7,7 @@
 
 import SwiftUI
 import SwiftData
-
-enum ToolbarDestination: String, Identifiable {
-    case missions
-    case stats
-    case shop
-    case profile
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .missions:
-            return "MISSIONS"
-        case .stats:
-            return "STATS"
-        case .shop:
-            return "SHOP"
-        case .profile:
-            return "PROFILE"
-        }
-    }
-
-    var iconName: String {
-        switch self {
-        case .missions:
-            return "List"
-        case .stats:
-            return "Stat"
-        case .shop:
-            return "Cart"
-        case .profile:
-            return "Head1"
-        }
-    }
-}
+import UIKit
 
 struct ToolbarDestinationPresentation: Identifiable {
     let id = UUID()
@@ -52,6 +18,7 @@ struct ToolbarDestinationPresentation: Identifiable {
 
 struct ToolbarDestinationView: View {
     let destination: ToolbarDestination
+    let selectedDestination: ToolbarDestination
     let playerName: String
     /// Today's raw steps (resets at midnight).
     let steps: Int
@@ -60,7 +27,7 @@ struct ToolbarDestinationView: View {
     /// Monotonic step count used for weekly-delivery progress.
     var accumulatedSteps: Int = 0
     var stepLength: Double = 0.7
-    var onClose: () -> Void = {}
+    var onSelect: (ToolbarDestination) -> Void = { _ in }
 
     @Environment(\.modelContext) private var context
     @Query(sort: \Mission.id) private var missions: [Mission]
@@ -68,35 +35,106 @@ struct ToolbarDestinationView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.45)
+            ScrollingBackground(imageName: "bg", speed: 22)
                 .ignoresSafeArea()
+            Pixel.ink.opacity(0.18).ignoresSafeArea()
 
-            DashboardPanel(title: destination.title, headerTrailing: AnyView(closeButton)) {
-                VStack(spacing: 10) {
-                    destinationContent
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 14) {
+                    topSummary
+
+                    DashboardPanel(title: destination.title) {
+                        VStack(spacing: 10) {
+                            destinationContent
+                        }
+                    }
                 }
+                .frame(maxWidth: TopSummaryMetrics.maxContentWidth)
+                .padding(.horizontal, TopSummaryMetrics.horizontalPadding)
+                .padding(.top, TopSummaryMetrics.topPadding)
+                .padding(.bottom, 110)
             }
-            .frame(maxWidth: 420)
-            .padding(20)
+
+            VStack {
+                Spacer()
+                bottomToolbar
+            }
+            .ignoresSafeArea(.keyboard, edges: .bottom)
         }
     }
 
-    private var closeButton: some View {
-        Button {
-            onClose()
-        } label: {
-            Image(systemName: "xmark")
-                .font(.system(size: 13, weight: .black))
-                .foregroundStyle(.white)
-                .frame(width: 30, height: 30)
-                .background(Pixel.red, in: RoundedRectangle(cornerRadius: 8))
+    private var topSummary: some View {
+        GeometryReader { proxy in
+            let availableWidth = proxy.size.width
+            let playerCardWidth = TopSummaryMetrics.playerCardWidth(for: availableWidth)
+            let stepCardWidth = TopSummaryMetrics.stepCardWidth(for: availableWidth)
+
+            HStack(spacing: TopSummaryMetrics.gap) {
+                HStack(spacing: 10) {
+                    Image(GameUIConfig.playerIconName)
+                        .resizable()
+                        .interpolation(.none)
+                        .scaledToFit()
+                        .frame(
+                            width: TopSummaryMetrics.iconSide,
+                            height: TopSummaryMetrics.iconSide
+                        )
+
+                    Text(playerName.uppercased())
+                        .font(Pixel.font(TopSummaryMetrics.playerTextSize, weight: .heavy))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                }
+                .padding(TopSummaryMetrics.contentPadding)
+                .frame(width: playerCardWidth, height: TopSummaryMetrics.cardHeight)
+                .background(
+                    RoundedRectangle(cornerRadius: TopSummaryMetrics.cornerRadius)
+                        .fill(Pixel.navy.opacity(0.96))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: TopSummaryMetrics.cornerRadius)
+                        .strokeBorder(.white.opacity(0.12), lineWidth: 1)
+                )
+
+                HStack(spacing: 10) {
+                    Image(GameUIConfig.stepsIconName)
+                        .resizable()
+                        .interpolation(.none)
+                        .scaledToFit()
+                        .frame(
+                            width: TopSummaryMetrics.iconSide,
+                            height: TopSummaryMetrics.iconSide
+                        )
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(GameUIConfig.stepsTitle)
+                            .font(Pixel.font(TopSummaryMetrics.stepsTitleSize, weight: .bold))
+                            .foregroundStyle(Pixel.textMuted)
+                        Text("\(steps)")
+                            .font(Pixel.font(TopSummaryMetrics.stepsValueSize, weight: .heavy))
+                            .foregroundStyle(Pixel.ink)
+                    }
+                }
+                .padding(TopSummaryMetrics.contentPadding)
+                .frame(width: stepCardWidth, height: TopSummaryMetrics.cardHeight)
+                .background(
+                    RoundedRectangle(cornerRadius: TopSummaryMetrics.cornerRadius)
+                        .fill(.white)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: TopSummaryMetrics.cornerRadius)
+                        .strokeBorder(Pixel.panelEdge, lineWidth: 1.5)
+                )
+            }
         }
-        .buttonStyle(.plain)
+        .frame(height: TopSummaryMetrics.cardHeight)
     }
 
     @ViewBuilder
     private var destinationContent: some View {
         switch destination {
+        case .home:
+            EmptyView()
         case .missions:
             missionContent
         case .stats:
@@ -292,6 +330,92 @@ struct ToolbarDestinationView: View {
 
     // MARK: - Shared
 
+    private var bottomToolbar: some View {
+        let columns = Array(
+            repeating: GridItem(.flexible(minimum: 0), spacing: 0),
+            count: GameUIConfig.toolbarItems.count
+        )
+
+        return LazyVGrid(columns: columns, spacing: 0) {
+            ForEach(GameUIConfig.toolbarItems) { item in
+                toolbarButton(item)
+            }
+        }
+        .padding(.vertical, ToolbarMetrics.verticalPadding)
+        .frame(maxWidth: ToolbarMetrics.maxToolbarWidth)
+        .frame(height: ToolbarMetrics.toolbarHeight)
+        .background(
+            RoundedRectangle(cornerRadius: ToolbarMetrics.cornerRadius)
+                .fill(Color(red: 0.05, green: 0.16, blue: 0.25).opacity(0.92))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: ToolbarMetrics.cornerRadius)
+                .strokeBorder(Color(red: 0.12, green: 0.28, blue: 0.40), lineWidth: 2)
+        )
+        .padding(.horizontal, ToolbarMetrics.horizontalPadding)
+        .padding(.bottom, ToolbarMetrics.bottomPadding)
+    }
+
+    private func toolbarButton(_ item: GameToolbarItem) -> some View {
+        let isSelected = item.destination == selectedDestination
+
+        return Button {
+            onSelect(item.destination)
+        } label: {
+            ZStack {
+                RoundedRectangle(cornerRadius: ToolbarMetrics.activeCornerRadius)
+                    .fill(isSelected ? Color(red: 0.11, green: 0.28, blue: 0.39) : .clear)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: ToolbarMetrics.activeCornerRadius)
+                            .strokeBorder(isSelected ? Color(red: 0.18, green: 0.38, blue: 0.52) : .clear, lineWidth: 2)
+                    )
+                    .padding(.horizontal, ToolbarMetrics.itemHorizontalInset)
+
+                VStack(spacing: 0) {
+                    toolbarIcon(for: item, isSelected: isSelected)
+
+                    Text(item.title)
+                        .font(.custom("AvenirNext-Heavy", size: ToolbarMetrics.titleFontSize))
+                        .foregroundStyle(isSelected ? .yellow : .white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .frame(height: ToolbarMetrics.titleHeight)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: ToolbarMetrics.buttonHeight)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func toolbarIcon(for item: GameToolbarItem, isSelected: Bool) -> some View {
+        toolbarImage(named: item.iconName)
+            .renderingMode(.original)
+            .resizable()
+            .interpolation(.none)
+            .scaledToFit()
+            .frame(
+                width: isSelected ? ToolbarMetrics.selectedIconSide : ToolbarMetrics.iconSide,
+                height: isSelected ? ToolbarMetrics.selectedIconSide : ToolbarMetrics.iconSide
+            )
+            .frame(height: ToolbarMetrics.iconFrameHeight)
+            .opacity(isSelected ? 1 : 0.86)
+            .shadow(color: .black.opacity(0.35), radius: 1, x: 0, y: 1)
+    }
+
+    private func toolbarImage(named name: String) -> Image {
+        if let image = UIImage(named: name) {
+            return Image(uiImage: image)
+        }
+
+        if let url = Bundle.main.url(forResource: name, withExtension: "png"),
+           let image = UIImage(contentsOfFile: url.path) {
+            return Image(uiImage: image)
+        }
+
+        return Image(systemName: "square.grid.2x2.fill")
+    }
+
     private func toolbarRow(icon: String, title: String, detail: String) -> some View {
         HStack(spacing: 12) {
             Image(icon)
@@ -307,6 +431,7 @@ struct ToolbarDestinationView: View {
                 Text(detail)
                     .font(Pixel.font(12, weight: .bold))
                     .foregroundStyle(Pixel.textMuted)
+                    .lineLimit(2)
             }
 
             Spacer()
@@ -340,7 +465,8 @@ struct ToolbarDestinationView: View {
 
 #Preview("Toolbar Destination") {
     ToolbarDestinationView(
-        destination: .missions,
+        destination: .stats,
+        selectedDestination: .stats,
         playerName: "Valentine",
         steps: 7245,
         distance: 5120.45,

@@ -197,7 +197,7 @@ struct PixelStepper: View {
     }
 }
 
-/// Wide background image scrolling left→right in a seamless loop.
+/// Wide background image scrolling right→left in a seamless loop.
 struct ScrollingBackground: View {
     let imageName: String
     /// Scroll speed in points per second.
@@ -215,8 +215,8 @@ struct ScrollingBackground: View {
                 image(width: tile, height: h)
                 image(width: tile, height: h)
             }
-            // Slide right: start one tile to the left, end at zero, repeat.
-            .offset(x: animate ? 0 : -tile)
+            // Slide left: start at zero, end one tile to the left, repeat.
+            .offset(x: animate ? -tile : 0)
             .frame(width: geo.size.width, height: h, alignment: .leading)
             .clipped()
             .animation(

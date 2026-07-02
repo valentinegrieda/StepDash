@@ -46,6 +46,16 @@
     "swift-dependencies" : "/Users/valentinegriedasahuburua/StepDash/.DerivedData/Build/Intermediates.noindex/StepDash.build/Debug-iphoneos/StepDash.build/Objects-normal/arm64/PixelTheme.swiftdeps",
     "swiftmodule" : "/Users/valentinegriedasahuburua/StepDash/.DerivedData/Build/Intermediates.noindex/StepDash.build/Debug-iphoneos/StepDash.build/Objects-normal/arm64/PixelTheme~partial.swiftmodule"
   },
+  "/Users/valentinegriedasahuburua/StepDash/StepDash/Audio/BackgroundMusicPlayer.swift" : {
+    "const-values" : "/Users/valentinegriedasahuburua/StepDash/.DerivedData/Build/Intermediates.noindex/StepDash.build/Debug-iphoneos/StepDash.build/Objects-normal/arm64/BackgroundMusicPlayer.swiftconstvalues",
+    "dependencies" : "/Users/valentinegriedasahuburua/StepDash/.DerivedData/Build/Intermediates.noindex/StepDash.build/Debug-iphoneos/StepDash.build/Objects-normal/arm64/BackgroundMusicPlayer.d",
+    "diagnostics" : "/Users/valentinegriedasahuburua/StepDash/.DerivedData/Build/Intermediates.noindex/StepDash.build/Debug-iphoneos/StepDash.build/Objects-normal/arm64/BackgroundMusicPlayer.dia",
+    "index-unit-output-path" : "/StepDash.build/Debug-iphoneos/StepDash.build/Objects-normal/arm64/BackgroundMusicPlayer.o",
+    "llvm-bc" : "/Users/valentinegriedasahuburua/StepDash/.DerivedData/Build/Intermediates.noindex/StepDash.build/Debug-iphoneos/StepDash.build/Objects-normal/arm64/BackgroundMusicPlayer.bc",
+    "object" : "/Users/valentinegriedasahuburua/StepDash/.DerivedData/Build/Intermediates.noindex/StepDash.build/Debug-iphoneos/StepDash.build/Objects-normal/arm64/BackgroundMusicPlayer.o",
+    "swift-dependencies" : "/Users/valentinegriedasahuburua/StepDash/.DerivedData/Build/Intermediates.noindex/StepDash.build/Debug-iphoneos/StepDash.build/Objects-normal/arm64/BackgroundMusicPlayer.swiftdeps",
+    "swiftmodule" : "/Users/valentinegriedasahuburua/StepDash/.DerivedData/Build/Intermediates.noindex/StepDash.build/Debug-iphoneos/StepDash.build/Objects-normal/arm64/BackgroundMusicPlayer~partial.swiftmodule"
+  },
   "/Users/valentinegriedasahuburua/StepDash/StepDash/ContentView.swift" : {
     "const-values" : "/Users/valentinegriedasahuburua/StepDash/.DerivedData/Build/Intermediates.noindex/StepDash.build/Debug-iphoneos/StepDash.build/Objects-normal/arm64/ContentView.swiftconstvalues",
     "dependencies" : "/Users/valentinegriedasahuburua/StepDash/.DerivedData/Build/Intermediates.noindex/StepDash.build/Debug-iphoneos/StepDash.build/Objects-normal/arm64/ContentView.d",

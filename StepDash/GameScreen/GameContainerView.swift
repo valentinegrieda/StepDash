@@ -10,48 +10,48 @@ struct GameContainerView: View {
     @Query private var missions: [Mission]
     @Query private var players: [Player]
 
-    @State private var presentation: ToolbarDestinationPresentation?
+    @State private var selectedDestination: ToolbarDestination = .home
     @State private var todaySteps = 0
     @State private var accumulatedSteps = 0
 
     private var todayDistance: Double { Double(todaySteps) * stepLength }
 
     var body: some View {
-        ZStack {
-            GameSceneRepresentable(
-                name: name,
-                stepLength: stepLength,
-                onToolbarItemSelected: { itemId, _, _ in
-                    guard let selected = ToolbarDestination(rawValue: itemId) else { return }
-                    presentation = ToolbarDestinationPresentation(
-                        destination: selected,
-                        steps: todaySteps,
-                        distance: todayDistance
-                    )
-                },
-                onStepUpdate: { today, accumulated, _ in
-                    handleStep(today: today, accumulated: accumulated)
-                }
-            )
-            .ignoresSafeArea()
-
-            if let presentation {
+        Group {
+            if selectedDestination == .home {
+                homeScene
+            } else {
                 ToolbarDestinationView(
-                    destination: presentation.destination,
+                    destination: selectedDestination,
+                    selectedDestination: selectedDestination,
                     playerName: name,
                     steps: todaySteps,
                     distance: todayDistance,
                     accumulatedSteps: accumulatedSteps,
                     stepLength: stepLength,
-                    onClose: {
-                        self.presentation = nil
-                    }
+                    onSelect: selectDestination
                 )
-                .transition(.opacity.combined(with: .scale(scale: 0.96)))
             }
         }
-        .animation(.easeOut(duration: 0.18), value: presentation?.id)
+        .animation(.easeOut(duration: 0.18), value: selectedDestination)
         .onAppear { Mission.seedIfNeeded(context: context) }
+    }
+
+    private var homeScene: some View {
+        GameSceneRepresentable(
+            name: name,
+            stepLength: stepLength,
+            activeToolbarItemID: selectedDestination.rawValue,
+            onToolbarItemSelected: { itemId, steps, _ in
+                todaySteps = steps
+                guard let selected = ToolbarDestination(rawValue: itemId) else { return }
+                selectDestination(selected)
+            },
+            onStepUpdate: { today, accumulated, _ in
+                handleStep(today: today, accumulated: accumulated)
+            }
+        )
+        .ignoresSafeArea()
     }
 
     /// Records today's steps/distance and evaluates every accepted mission for
@@ -91,11 +91,16 @@ struct GameContainerView: View {
             try? context.save()
         }
     }
+
+    private func selectDestination(_ destination: ToolbarDestination) {
+        selectedDestination = destination
+    }
 }
 
 private struct GameSceneRepresentable: UIViewRepresentable {
     let name: String
     let stepLength: Double
+    let activeToolbarItemID: String
     let onToolbarItemSelected: (String, Int, Double) -> Void
     let onStepUpdate: (Int, Int, Double) -> Void
 
@@ -103,14 +108,16 @@ private struct GameSceneRepresentable: UIViewRepresentable {
         GameSKView(
             playerName: name,
             stepLength: stepLength,
+            activeToolbarItemID: activeToolbarItemID,
             onToolbarItemSelected: onToolbarItemSelected,
             onStepUpdate: onStepUpdate
         )
     }
 
     func updateUIView(_ uiView: SKView, context: Context) {
-        guard let view = uiView as? GameSKView else { return }
-        view.updateToolbarHandler(onToolbarItemSelected)
-        view.updateStepHandler(onStepUpdate)
+        guard let gameView = uiView as? GameSKView else { return }
+        gameView.updateToolbarHandler(onToolbarItemSelected)
+        gameView.updateStepHandler(onStepUpdate)
+        gameView.updateActiveToolbarItem(activeToolbarItemID)
     }
 }
