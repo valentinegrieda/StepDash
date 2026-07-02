@@ -30,6 +30,10 @@ class GameScene: SKScene {
 
     // MARK: - STATE
     var lastStepCount: Int = 0
+    var hasReceivedInitialStepCount = false
+    var pendingStepAnimations = 0
+    var isAnimatingDetectedStep = false
+    var nextStepStartsWithLeadingLeftFoot = true
     var activeToolbarItemID: String = "home"
 
     // MARK: - INIT
@@ -66,6 +70,19 @@ class GameScene: SKScene {
                 self.distanceLabel.text =
                 "Distance: \(String(format: "%.2f", self.distance))m"
 
+                if !self.hasReceivedInitialStepCount {
+                    self.lastStepCount = todaySteps
+                    self.hasReceivedInitialStepCount = true
+                    self.onStepUpdate?(todaySteps, accumulatedSteps, self.distance)
+                    return
+                }
+                
+                let detectedNewSteps = todaySteps - self.lastStepCount
+                
+                if detectedNewSteps > 0 {
+                    self.onStepTriggered(stepCount: detectedNewSteps)
+                }
+                
                 // 🔥 STEP EDGE DETECTION (ONLY NEW STEP TRIGGERS GAME)
                 if todaySteps > self.lastStepCount {
 

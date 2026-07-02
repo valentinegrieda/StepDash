@@ -7,7 +7,25 @@
 import SpriteKit
 
 extension GameScene {
+    var idleTexture: SKTexture {
+        SKTexture(imageNamed: "player_idle")
+    }
     
+    var walkFrameOne: SKTexture {
+        SKTexture(imageNamed: "player_walk1")
+    }
+    
+    var walkFrameTwo: SKTexture {
+        SKTexture(imageNamed: "player_walk2")
+    }
+    
+    func texturesForNextDetectedStep() -> [SKTexture] {
+        if nextStepStartsWithLeadingLeftFoot {
+            return [walkFrameOne, walkFrameTwo]
+        }
+        
+        return [walkFrameTwo, walkFrameOne]
+    }
     
     // MARK: - PLAYER
     func setupPlayer() {
@@ -24,30 +42,36 @@ extension GameScene {
 
     // MARK: - IDLE
     func setIdle() {
-        playerSprite.texture = SKTexture(imageNamed: "player_idle")
         playerSprite.removeAllActions()
+        playerSprite.texture = idleTexture
     }
 
-    // MARK: - WALK PULSE (KEY LOGIC)
-    func runWalkPulse() {
-
-        playerSprite.removeAllActions()
-
-        let frames = [
-            SKTexture(imageNamed: "player_walk1"),
-            SKTexture(imageNamed: "player_walk2")
-        ]
-
-        let animate = SKAction.animate(with: frames, timePerFrame: 0.15)
-
-        let once = SKAction.sequence([
-            animate,
-            SKAction.run { [weak self] in
-                self?.setIdle()
-            }
+    func animateDetectedStep(completion: @escaping () -> Void) {
+        let stepTextures = texturesForNextDetectedStep()
+        
+        let textureAnimation = SKAction.animate(
+            with: stepTextures,
+            timePerFrame: 0.05,
+            resize: false,
+            restore: false
+        )
+        
+        let bodySway = SKAction.sequence([
+            .moveBy(x: 5, y: 0, duration: 0.12),
+            .moveBy(x: -5, y: 0, duration: 0.12)
         ])
-
-        playerSprite.run(once)
+        
+        let stepAnimation = SKAction.group([
+            textureAnimation,
+            bodySway
+        ])
+        
+        let finishStep = SKAction.run { [weak self] in
+            self?.nextStepStartsWithLeadingLeftFoot.toggle()
+            completion()
+        }
+        
+        playerSprite.run(.sequence([stepAnimation, finishStep]))
     }
     
 }
