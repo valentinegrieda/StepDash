@@ -9,20 +9,17 @@ final class GameSKView: SKView {
     let stepLength: Double
     var activeToolbarItemID: String
     var onToolbarItemSelected: ((String, Int, Double) -> Void)?
-    var onStepUpdate: ((Int, Int, Double) -> Void)?
 
     init(
         playerName: String,
         stepLength: Double,
         activeToolbarItemID: String = "home",
-        onToolbarItemSelected: ((String, Int, Double) -> Void)? = nil,
-        onStepUpdate: ((Int, Int, Double) -> Void)? = nil
+        onToolbarItemSelected: ((String, Int, Double) -> Void)? = nil
     ) {
         self.playerName = playerName
         self.stepLength = stepLength
         self.activeToolbarItemID = activeToolbarItemID
         self.onToolbarItemSelected = onToolbarItemSelected
-        self.onStepUpdate = onStepUpdate
         super.init(frame: .zero)
     }
 
@@ -45,7 +42,6 @@ final class GameSKView: SKView {
             stepLength: stepLength
         )
         scene.onToolbarItemSelected = onToolbarItemSelected
-        scene.onStepUpdate = onStepUpdate
         scene.activeToolbarItemID = activeToolbarItemID
         scene.scaleMode = .resizeFill
 
@@ -72,11 +68,6 @@ final class GameSKView: SKView {
     func updateToolbarHandler(_ handler: ((String, Int, Double) -> Void)?) {
         onToolbarItemSelected = handler
         (scene as? GameScene)?.onToolbarItemSelected = handler
-    }
-
-    func updateStepHandler(_ handler: ((Int, Int, Double) -> Void)?) {
-        onStepUpdate = handler
-        (scene as? GameScene)?.onStepUpdate = handler
     }
 
     func updateActiveToolbarItem(_ itemID: String) {

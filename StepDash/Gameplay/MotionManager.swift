@@ -7,11 +7,15 @@ final class MotionManager {
 
     private let pedometer = CMPedometer()
 
-    /// Called on the main thread with `(todaySteps, accumulatedSteps)`.
+    /// Step handlers keyed by a token. Multiple subscribers are supported so the
+    /// same feed can drive several consumers at once — e.g. the always-on data
+    /// pipeline on the shell AND the game scene's visuals — each with its own
+    /// independent lifecycle. Handlers receive `(todaySteps, accumulatedSteps)`
+    /// on the main thread.
     /// - `todaySteps`: raw pedometer count for the current day, resets at midnight.
     /// - `accumulatedSteps`: monotonic count that survives midnight (used as the
     ///   baseline reference for accepted weekly deliveries).
-    var onStep: ((Int, Int) -> Void)?
+    private var handlers: [UUID: (Int, Int) -> Void] = [:]
 
     private var isRunning = false
     private var timer: Timer?
@@ -36,6 +40,27 @@ final class MotionManager {
 
     /// Monotonic steps that survive midnight.
     var accumulatedSteps: Int { accumulatedBase + lastRawSteps }
+
+    /// Registers a step handler and returns a token used to remove it later. The
+    /// handler is invoked immediately with the current values so a late
+    /// subscriber is in sync right away.
+    @discardableResult
+    func addHandler(_ handler: @escaping (Int, Int) -> Void) -> UUID {
+        let token = UUID()
+        handlers[token] = handler
+        handler(todaySteps, accumulatedSteps)
+        return token
+    }
+
+    func removeHandler(_ token: UUID) {
+        handlers.removeValue(forKey: token)
+    }
+
+    private func notify(today: Int, accumulated: Int) {
+        for handler in handlers.values {
+            handler(today, accumulated)
+        }
+    }
 
     func start() {
 
@@ -83,7 +108,7 @@ final class MotionManager {
                 UserDefaults.standard.set(self.accumulatedBase, forKey: Keys.accumulatedBase)
                 UserDefaults.standard.set(self.lastRawSteps, forKey: Keys.lastRaw)
 
-                self.onStep?(raw, self.accumulatedBase + raw)
+                self.notify(today: raw, accumulated: self.accumulatedBase + raw)
             }
         }
     }
@@ -100,6 +125,6 @@ final class MotionManager {
         lastRawSteps = 0
         UserDefaults.standard.removeObject(forKey: Keys.accumulatedBase)
         UserDefaults.standard.removeObject(forKey: Keys.lastRaw)
-        onStep?(0, 0)
+        notify(today: 0, accumulated: 0)
     }
 }

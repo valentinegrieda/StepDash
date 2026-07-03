@@ -9,6 +9,8 @@ class GameScene: SKScene {
 
     // MARK: - MOTION
     let motion = MotionManager.shared
+    /// Token for this scene's visual-only step subscription; removed on teardown.
+    private var motionToken: UUID?
 
     // MARK: - BACKGROUND
     let background1 = SKSpriteNode(imageNamed: "bg")
@@ -25,8 +27,6 @@ class GameScene: SKScene {
     var stepLength: Double
     var distance: Double = 0
     var onToolbarItemSelected: ((String, Int, Double) -> Void)?
-    /// Forwards each pedometer update to SwiftUI: `(todaySteps, accumulatedSteps, todayDistance)`.
-    var onStepUpdate: ((Int, Int, Double) -> Void)?
 
     // MARK: - STATE
     var lastStepCount: Int = 0
@@ -47,6 +47,12 @@ class GameScene: SKScene {
         fatalError("init(coder:) has not been implemented")
     }
 
+    deinit {
+        if let motionToken {
+            motion.removeHandler(motionToken)
+        }
+    }
+
     // MARK: - DID MOVE
     override func didMove(to view: SKView) {
 
@@ -60,7 +66,11 @@ class GameScene: SKScene {
         setupDistanceLabel()
         setupBottomToolbar()
 
-        motion.onStep = { [weak self] todaySteps, accumulatedSteps in
+        // Visual-only subscription: the labels + walk animation react to steps
+        // while the scene is on screen. The data pipeline (stats + missions) is
+        // owned by the shell's GameSession, so it keeps running when this scene
+        // is gone. Motion is started by the shell, not here.
+        motionToken = motion.addHandler { [weak self] todaySteps, _ in
             guard let self else { return }
 
             DispatchQueue.main.async {
@@ -85,18 +95,12 @@ class GameScene: SKScene {
                 
                 // 🔥 STEP EDGE DETECTION (ONLY NEW STEP TRIGGERS GAME)
                 if todaySteps > self.lastStepCount {
-
                     self.onStepTriggered()
                 }
 
                 self.lastStepCount = todaySteps
-
-                // Forward to SwiftUI for mission progress + daily stats.
-                self.onStepUpdate?(todaySteps, accumulatedSteps, self.distance)
             }
         }
-
-        motion.start()
     }
 
 
