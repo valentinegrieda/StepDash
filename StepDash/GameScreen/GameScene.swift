@@ -80,22 +80,19 @@ class GameScene: SKScene {
                 self.distanceLabel.text =
                 "Distance: \(String(format: "%.2f", self.distance))m"
 
+                // First real reading just seeds the baseline — don't animate the
+                // (possibly large) jump from 0 to today's already-walked total.
                 if !self.hasReceivedInitialStepCount {
                     self.lastStepCount = todaySteps
                     self.hasReceivedInitialStepCount = true
-                    self.onStepUpdate?(todaySteps, accumulatedSteps, self.distance)
                     return
                 }
-                
+
+                // Animate one walk cycle per newly detected step.
                 let detectedNewSteps = todaySteps - self.lastStepCount
-                
+
                 if detectedNewSteps > 0 {
                     self.onStepTriggered(stepCount: detectedNewSteps)
-                }
-                
-                // 🔥 STEP EDGE DETECTION (ONLY NEW STEP TRIGGERS GAME)
-                if todaySteps > self.lastStepCount {
-                    self.onStepTriggered()
                 }
 
                 self.lastStepCount = todaySteps

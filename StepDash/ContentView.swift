@@ -44,7 +44,6 @@ struct ContentView: View {
              */
 
             if players.isEmpty {
-                
                 OnboardingView()
             } else {
                 //CheckingScreen()

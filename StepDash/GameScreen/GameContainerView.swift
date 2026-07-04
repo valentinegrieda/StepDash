@@ -15,7 +15,12 @@ struct GameContainerView: View {
     @State private var session = GameSession()
     @State private var selectedDestination: ToolbarDestination = .home
 
-    private var todayDistance: Double { Double(session.todaySteps) * stepLength }
+    // The persisted Player is the source of truth for name + step length,
+    // falling back to the values passed in if the query hasn't resolved yet.
+    private var databasePlayer: Player? { players.first }
+    private var playerName: String { databasePlayer?.name ?? name }
+    private var playerStepLength: Double { databasePlayer?.stepLength ?? stepLength }
+    private var todayDistance: Double { Double(session.todaySteps) * playerStepLength }
 
     var body: some View {
         Group {
@@ -25,11 +30,11 @@ struct GameContainerView: View {
                 ToolbarDestinationView(
                     destination: selectedDestination,
                     selectedDestination: selectedDestination,
-                    playerName: name,
+                    playerName: playerName,
                     steps: session.todaySteps,
                     distance: todayDistance,
                     accumulatedSteps: session.accumulatedSteps,
-                    stepLength: stepLength,
+                    stepLength: playerStepLength,
                     onSelect: selectDestination
                 )
             }
