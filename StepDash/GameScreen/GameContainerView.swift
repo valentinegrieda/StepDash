@@ -1,5 +1,4 @@
 import SwiftUI
-import SpriteKit
 import SwiftData
 
 struct GameContainerView: View {
@@ -25,7 +24,13 @@ struct GameContainerView: View {
     var body: some View {
         Group {
             if selectedDestination == .home {
-                homeScene
+                HomeView(
+                    playerName: playerName,
+                    stepLength: playerStepLength,
+                    session: session,
+                    selectedDestination: selectedDestination,
+                    onSelect: selectDestination
+                )
             } else {
                 ToolbarDestinationView(
                     destination: selectedDestination,
@@ -47,20 +52,6 @@ struct GameContainerView: View {
         .onChange(of: session.todaySteps) { _, _ in
             evaluateStep()
         }
-    }
-
-    private var homeScene: some View {
-        GameSceneRepresentable(
-            name: playerName,
-            stepLength: playerStepLength,
-            activeToolbarItemID: selectedDestination.rawValue,
-            onToolbarItemSelected: { itemId, _, _ in
-                guard let selected = ToolbarDestination(rawValue: itemId) else { return }
-                selectDestination(selected)
-            }
-        )
-        .id(playerName)
-        .ignoresSafeArea()
     }
 
     /// Runs on every step change, regardless of which page is visible: records
@@ -104,27 +95,5 @@ struct GameContainerView: View {
 
     private func selectDestination(_ destination: ToolbarDestination) {
         selectedDestination = destination
-    }
-}
-
-private struct GameSceneRepresentable: UIViewRepresentable {
-    let name: String
-    let stepLength: Double
-    let activeToolbarItemID: String
-    let onToolbarItemSelected: (String, Int, Double) -> Void
-
-    func makeUIView(context: Context) -> SKView {
-        GameSKView(
-            playerName: name,
-            stepLength: stepLength,
-            activeToolbarItemID: activeToolbarItemID,
-            onToolbarItemSelected: onToolbarItemSelected
-        )
-    }
-
-    func updateUIView(_ uiView: SKView, context: Context) {
-        guard let gameView = uiView as? GameSKView else { return }
-        gameView.updateToolbarHandler(onToolbarItemSelected)
-        gameView.updateActiveToolbarItem(activeToolbarItemID)
     }
 }

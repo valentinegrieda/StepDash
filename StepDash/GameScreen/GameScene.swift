@@ -15,6 +15,9 @@ class GameScene: SKScene {
     // MARK: - BACKGROUND
     let background1 = SKSpriteNode(imageNamed: "bg")
     let background2 = SKSpriteNode(imageNamed: "bg")
+    // Brick strip under the city background (scrolls with it).
+    let brick1 = SKSpriteNode(imageNamed: "Brick")
+    let brick2 = SKSpriteNode(imageNamed: "Brick")
 
     // MARK: - UI
     let playerNameLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
@@ -59,12 +62,9 @@ class GameScene: SKScene {
         anchorPoint = CGPoint(x: 0, y: 0)
 
         setupBackground()
+        setupBrick()
         setupPlayer()
-        setupPlayerNameLabel()
         setIdle()
-        setupStepLabel()
-        setupDistanceLabel()
-        setupBottomToolbar()
 
         // Visual-only subscription: the labels + walk animation react to steps
         // while the scene is on screen. The data pipeline (stats + missions) is
@@ -74,12 +74,6 @@ class GameScene: SKScene {
             guard let self else { return }
 
             DispatchQueue.main.async {
-                self.stepLabel.text = "\(todaySteps)"
-                self.distance = self.stepLength * Double(todaySteps)
-
-                self.distanceLabel.text =
-                "Distance: \(String(format: "%.2f", self.distance))m"
-
                 // First real reading just seeds the baseline — don't animate the
                 // (possibly large) jump from 0 to today's already-walked total.
                 if !self.hasReceivedInitialStepCount {
@@ -100,26 +94,21 @@ class GameScene: SKScene {
         }
     }
 
-
-    // MARK: - DEBUG
+    // MARK: - DEBUG (tap scrolls the world one step)
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if handleToolbarTouch(touches) {
-            return
-        }
-
-        moveBackground(distance: 40)
+        onStepTriggered()
     }
 }
 
 #Preview {
     let scene = GameScene(
-        size: CGSize(width: 393, height: 852),
+        size: CGSize(width: 393, height: 480),
         playerName: "Valentine",
         stepLength: 0.7
     )
     scene.scaleMode = .resizeFill
 
     return SpriteView(scene: scene)
-        .frame(width: 393, height: 852)
+        .frame(width: 393, height: 480)
         .ignoresSafeArea()
 }

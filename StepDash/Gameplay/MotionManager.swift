@@ -127,4 +127,15 @@ final class MotionManager {
         UserDefaults.standard.removeObject(forKey: Keys.lastRaw)
         notify(today: 0, accumulated: 0)
     }
+
+    #if DEBUG
+    /// Debug: simulate steps for testing without walking. Works best on the
+    /// Simulator (the pedometer is unavailable there, so no poll overwrites it;
+    /// on a device the next 1.5s poll resets it to the real count).
+    func debugAddSteps(_ count: Int) {
+        lastRawSteps += count
+        UserDefaults.standard.set(lastRawSteps, forKey: Keys.lastRaw)
+        notify(today: lastRawSteps, accumulated: accumulatedBase + lastRawSteps)
+    }
+    #endif
 }

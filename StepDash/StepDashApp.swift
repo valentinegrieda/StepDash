@@ -18,6 +18,6 @@ struct StepDashApp: App {
                 NotificationManager.shared.handleScenePhase(newPhase)
             }
         }
-        .modelContainer(for: [Player.self, Mission.self, DailyStepRecord.self])
+        .modelContainer(for: [Player.self, Mission.self, DailyStepRecord.self, CurrentDelivery.self])
     }
 }

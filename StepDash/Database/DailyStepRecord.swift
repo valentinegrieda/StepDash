@@ -12,12 +12,15 @@ final class DailyStepRecord {
     var steps: Int
     var distance: Double
     var deliveriesDone: Int
+    /// Steps "used up" by deliveries claimed today (the consumption ledger).
+    var consumedSteps: Int = 0
 
-    init(date: Date, steps: Int = 0, distance: Double = 0, deliveriesDone: Int = 0) {
+    init(date: Date, steps: Int = 0, distance: Double = 0, deliveriesDone: Int = 0, consumedSteps: Int = 0) {
         self.date = date
         self.steps = steps
         self.distance = distance
         self.deliveriesDone = deliveriesDone
+        self.consumedSteps = consumedSteps
     }
 }
 

@@ -10,6 +10,8 @@ struct ContentView: View {
     var body: some View {
         VStack {
             //Text("Players: \(players.count)")
+            // Debug: disabled so it doesn't disrupt the home design.
+            /*
             Button("Reset Player Data") {
                 do {
                     try modelContext.delete(model: Player.self)
@@ -18,7 +20,8 @@ struct ContentView: View {
                     print(error)
                 }
             }
-            
+            */
+
             /*
             Button("Test Insert") {
                 let player = Player(
@@ -56,10 +59,27 @@ struct ContentView: View {
         .onChange(of: players.count, initial: true) { _, newCount in
             let hasRegisteredUser = newCount > 0
             NotificationManager.shared.updateReminderEligibility(hasRegisteredUser: hasRegisteredUser)
-            
+
             if hasRegisteredUser {
                 NotificationManager.shared.scheduleReminderIfPossible()
             }
         }
     }
+}
+
+#Preview("Home (seeded player)") {
+    let container = try! ModelContainer(
+        for: Player.self, Mission.self, DailyStepRecord.self, CurrentDelivery.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
+    container.mainContext.insert(
+        Player(name: "Player", gender: "male", height: 175, stepLength: 0.72, coins: 340)
+    )
+    return NavigationStack { ContentView() }
+        .modelContainer(container)
+}
+
+#Preview("Onboarding (no player)") {
+    NavigationStack { ContentView() }
+        .modelContainer(for: [Player.self, Mission.self, DailyStepRecord.self, CurrentDelivery.self], inMemory: true)
 }

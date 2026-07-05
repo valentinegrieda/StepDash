@@ -95,6 +95,6 @@ enum ToolbarMetrics {
     static let iconFrameHeight: CGFloat = 36
     static let titleHeight: CGFloat = 18
     static let titleFontSize: CGFloat = 12
-    static let cornerRadius: CGFloat = 18
-    static let activeCornerRadius: CGFloat = 14
+    static let cornerRadius: CGFloat = 8
+    static let activeCornerRadius: CGFloat = 8
 }

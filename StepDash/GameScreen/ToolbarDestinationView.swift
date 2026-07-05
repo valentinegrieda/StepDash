@@ -55,7 +55,7 @@ struct ToolbarDestinationView: View {
 
             VStack {
                 Spacer()
-                bottomToolbar
+                GameBottomToolbar(selected: selectedDestination, onSelect: onSelect)
             }
             .ignoresSafeArea(.keyboard, edges: .bottom)
         }
@@ -260,92 +260,6 @@ struct ToolbarDestinationView: View {
     }
 
     // MARK: - Shared
-
-    private var bottomToolbar: some View {
-        let columns = Array(
-            repeating: GridItem(.flexible(minimum: 0), spacing: 0),
-            count: GameUIConfig.toolbarItems.count
-        )
-
-        return LazyVGrid(columns: columns, spacing: 0) {
-            ForEach(GameUIConfig.toolbarItems) { item in
-                toolbarButton(item)
-            }
-        }
-        .padding(.vertical, ToolbarMetrics.verticalPadding)
-        .frame(maxWidth: ToolbarMetrics.maxToolbarWidth)
-        .frame(height: ToolbarMetrics.toolbarHeight)
-        .background(
-            RoundedRectangle(cornerRadius: ToolbarMetrics.cornerRadius)
-                .fill(Color(red: 0.05, green: 0.16, blue: 0.25).opacity(0.92))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: ToolbarMetrics.cornerRadius)
-                .strokeBorder(Color(red: 0.12, green: 0.28, blue: 0.40), lineWidth: 2)
-        )
-        .padding(.horizontal, ToolbarMetrics.horizontalPadding)
-        .padding(.bottom, ToolbarMetrics.bottomPadding)
-    }
-
-    private func toolbarButton(_ item: GameToolbarItem) -> some View {
-        let isSelected = item.destination == selectedDestination
-
-        return Button {
-            onSelect(item.destination)
-        } label: {
-            ZStack {
-                RoundedRectangle(cornerRadius: ToolbarMetrics.activeCornerRadius)
-                    .fill(isSelected ? Color(red: 0.11, green: 0.28, blue: 0.39) : .clear)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: ToolbarMetrics.activeCornerRadius)
-                            .strokeBorder(isSelected ? Color(red: 0.18, green: 0.38, blue: 0.52) : .clear, lineWidth: 2)
-                    )
-                    .padding(.horizontal, ToolbarMetrics.itemHorizontalInset)
-
-                VStack(spacing: 0) {
-                    toolbarIcon(for: item, isSelected: isSelected)
-
-                    Text(item.title)
-                        .font(.custom("AvenirNext-Heavy", size: ToolbarMetrics.titleFontSize))
-                        .foregroundStyle(isSelected ? .yellow : .white)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                        .frame(height: ToolbarMetrics.titleHeight)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .frame(height: ToolbarMetrics.buttonHeight)
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func toolbarIcon(for item: GameToolbarItem, isSelected: Bool) -> some View {
-        toolbarImage(named: item.iconName)
-            .renderingMode(.original)
-            .resizable()
-            .interpolation(.none)
-            .scaledToFit()
-            .frame(
-                width: isSelected ? ToolbarMetrics.selectedIconSide : ToolbarMetrics.iconSide,
-                height: isSelected ? ToolbarMetrics.selectedIconSide : ToolbarMetrics.iconSide
-            )
-            .frame(height: ToolbarMetrics.iconFrameHeight)
-            .opacity(isSelected ? 1 : 0.86)
-            .shadow(color: .black.opacity(0.35), radius: 1, x: 0, y: 1)
-    }
-
-    private func toolbarImage(named name: String) -> Image {
-        if let image = UIImage(named: name) {
-            return Image(uiImage: image)
-        }
-
-        if let url = Bundle.main.url(forResource: name, withExtension: "png"),
-           let image = UIImage(contentsOfFile: url.path) {
-            return Image(uiImage: image)
-        }
-
-        return Image(systemName: "square.grid.2x2.fill")
-    }
 
     private func toolbarRow(icon: String, title: String, detail: String) -> some View {
         HStack(spacing: 12) {
