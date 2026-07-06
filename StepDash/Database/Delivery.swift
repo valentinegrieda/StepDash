@@ -13,7 +13,7 @@ enum DeliveryCatalog {
     /// The pool of deliveries that can appear. (Replace/extend freely.)
     static let all: [DeliveryTemplate] = [
         DeliveryTemplate(recipient: "John",  goalSteps: 2_500, rewardCoins: 25),
-        DeliveryTemplate(recipient: "Maria", goalSteps: 1-500, rewardCoins: 15),
+        DeliveryTemplate(recipient: "Maria", goalSteps: 1_500, rewardCoins: 15),
         DeliveryTemplate(recipient: "Kenji", goalSteps: 3_000, rewardCoins: 30),
         DeliveryTemplate(recipient: "Amara", goalSteps: 4_500, rewardCoins: 45),
         DeliveryTemplate(recipient: "Liam",  goalSteps: 2_000, rewardCoins: 20),

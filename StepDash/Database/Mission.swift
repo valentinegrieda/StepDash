@@ -37,9 +37,8 @@ final class Mission {
     var isAccepted: Bool
     var isCompleted: Bool
 
-    /// For `weekly` missions: `accumulatedSteps` captured at accept time, so
-    /// progress = `accumulatedSteps - baselineSteps` and survives midnight.
-    /// Unused for `daily` missions (they read the whole day's count), stored as -1.
+    /// Steps captured at accept time. Daily missions use today's raw step count;
+    /// weekly missions use accumulated steps so they can survive midnight.
     var baselineSteps: Int
 
     /// Start of the period (day or week) this acceptance belongs to. Used to
@@ -97,13 +96,12 @@ extension Mission {
         }
     }
 
-    /// Accept the delivery: starts counting from now. Daily missions credit the
-    /// whole day; weekly missions capture an accumulated-step baseline.
-    func accept(now: Date, accumulatedSteps: Int) {
+    /// Accept the delivery and start counting progress from the current step count.
+    func accept(now: Date, todaySteps: Int, accumulatedSteps: Int) {
         isAccepted = true
         isCompleted = false
         periodStart = currentPeriodStart(now: now)
-        baselineSteps = (category == .weekly) ? accumulatedSteps : -1
+        baselineSteps = (category == .weekly) ? accumulatedSteps : todaySteps
     }
 
     /// Clears an acceptance whose period has elapsed (daily at midnight, weekly
@@ -123,15 +121,16 @@ extension Mission {
 
 extension Mission {
 
-    /// Steps counted toward this mission. Daily uses the whole day's steps;
-    /// weekly uses steps since acceptance. Zero until accepted.
+    /// Steps counted toward this mission. Daily and weekly both start from the
+    /// step count captured at acceptance time. Zero until accepted.
     func stepsTaken(todaySteps: Int, accumulatedSteps: Int) -> Int {
         guard isAccepted else { return 0 }
+        guard baselineSteps >= 0 else { return 0 }
         switch category {
         case .daily:
-            return max(0, todaySteps)
+            return max(0, todaySteps - baselineSteps)
         case .weekly:
-            return baselineSteps >= 0 ? max(0, accumulatedSteps - baselineSteps) : 0
+            return max(0, accumulatedSteps - baselineSteps)
         }
     }
 

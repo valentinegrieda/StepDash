@@ -142,7 +142,7 @@ struct ToolbarDestinationView: View {
                     Spacer()
                 }
                 Button("ACCEPT DELIVERY") {
-                    mission.accept(now: Date(), accumulatedSteps: accumulatedSteps)
+                    mission.accept(now: Date(), todaySteps: steps, accumulatedSteps: accumulatedSteps)
                     try? context.save()
                 }
                 .buttonStyle(PixelButtonStyle(fill: Pixel.grass))
