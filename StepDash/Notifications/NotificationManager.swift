@@ -47,6 +47,7 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         case .active:
             defaults.set(Date(), forKey: lastActiveDateKey)
             clearReminder()
+            clearStaleMissionCompletionNotifications()
         case .background:
             scheduleReminderIfPossible()
             printNotificationDebugState()
@@ -125,6 +126,28 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         ]
         notificationCenter.removePendingNotificationRequests(withIdentifiers: identifiers)
         notificationCenter.removeDeliveredNotifications(withIdentifiers: identifiers)
+    }
+
+    func clearStaleMissionCompletionNotifications() {
+        notificationCenter.getPendingNotificationRequests { [weak self] requests in
+            guard let self else { return }
+            let identifiers = requests
+                .map(\.identifier)
+                .filter { self.isMissionCompletionNotification($0) }
+
+            guard !identifiers.isEmpty else { return }
+            self.notificationCenter.removePendingNotificationRequests(withIdentifiers: identifiers)
+        }
+
+        notificationCenter.getDeliveredNotifications { [weak self] notifications in
+            guard let self else { return }
+            let identifiers = notifications
+                .map(\.request.identifier)
+                .filter { self.isMissionCompletionNotification($0) }
+
+            guard !identifiers.isEmpty else { return }
+            self.notificationCenter.removeDeliveredNotifications(withIdentifiers: identifiers)
+        }
     }
 
     func scheduleDeliveryCompletionFallback(recipient: String, currentSteps: Int, goalSteps: Int) {
@@ -242,6 +265,11 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
 
     private func missionCompletionFallbackIdentifier(for missionID: Int) -> String {
         "\(missionCompletionFallbackPrefix)\(missionID)"
+    }
+
+    private func isMissionCompletionNotification(_ identifier: String) -> Bool {
+        identifier.hasPrefix(missionCompletionPrefix)
+            || identifier.hasPrefix(missionCompletionFallbackPrefix)
     }
 
     private func deliveryCompletionNotifiedKey(recipient: String, dayKey: Date, goalSteps: Int) -> String {
