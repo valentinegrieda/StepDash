@@ -3,6 +3,7 @@ import CoreMotion
 import Foundation
 import SwiftData
 import SwiftUI
+import UIKit
 
 @MainActor
 final class MissionBackgroundRefreshManager {
@@ -12,6 +13,8 @@ final class MissionBackgroundRefreshManager {
     private let pedometer = CMPedometer()
     private var modelContainer: ModelContainer?
     private var didRegisterTask = false
+    private var backgroundDeliveryCheckTask: Task<Void, Never>?
+    private var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
 
     private init() {}
 
@@ -21,11 +24,16 @@ final class MissionBackgroundRefreshManager {
         scheduleRefresh()
     }
 
+    func scheduleRefreshSoon() {
+        scheduleRefresh()
+    }
+
     func handleScenePhase(_ phase: ScenePhase) {
         switch phase {
         case .background:
-            scheduleRefresh()
+            startBackgroundDeliveryChecks()
         case .active:
+            stopBackgroundDeliveryChecks()
             Task {
                 await evaluateAcceptedMissions()
             }
@@ -52,9 +60,10 @@ final class MissionBackgroundRefreshManager {
 
     private func scheduleRefresh() {
         let request = BGAppRefreshTaskRequest(identifier: taskIdentifier)
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60)
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 60)
 
         do {
+            BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: taskIdentifier)
             try BGTaskScheduler.shared.submit(request)
         } catch {
             print("Failed to schedule mission background refresh:", error)
@@ -72,6 +81,47 @@ final class MissionBackgroundRefreshManager {
         task.expirationHandler = {
             evaluationTask.cancel()
         }
+    }
+
+    private func startBackgroundDeliveryChecks() {
+        stopBackgroundDeliveryChecks()
+        scheduleRefresh()
+
+        backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(withName: "StepDashDeliveryCheck") { [weak self] in
+            Task { @MainActor in
+                self?.stopBackgroundDeliveryChecks()
+            }
+        }
+
+        backgroundDeliveryCheckTask = Task { [weak self] in
+            guard let self else { return }
+
+            while !Task.isCancelled {
+                await self.evaluateAcceptedMissions()
+
+                do {
+                    try await Task.sleep(for: .seconds(30))
+                } catch {
+                    break
+                }
+            }
+
+            await MainActor.run {
+                self.endBackgroundTaskIfNeeded()
+            }
+        }
+    }
+
+    private func stopBackgroundDeliveryChecks() {
+        backgroundDeliveryCheckTask?.cancel()
+        backgroundDeliveryCheckTask = nil
+        endBackgroundTaskIfNeeded()
+    }
+
+    private func endBackgroundTaskIfNeeded() {
+        guard backgroundTaskIdentifier != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
+        backgroundTaskIdentifier = .invalid
     }
 
     private func evaluateAcceptedMissions() async {

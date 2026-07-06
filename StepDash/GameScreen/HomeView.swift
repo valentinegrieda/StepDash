@@ -190,6 +190,8 @@ struct HomeView: View {
                             dayKey: delivery.dayKey,
                             goalSteps: delivery.goalSteps
                         )
+                    } else {
+                        MissionBackgroundRefreshManager.shared.scheduleRefreshSoon()
                     }
                 }
                     .buttonStyle(DeliveryButtonStyle(fill: Pixel.dGreen, edge: Pixel.dGreenEdge, textColor: .white))

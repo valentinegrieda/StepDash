@@ -15,7 +15,6 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
     private let missionCompletionFallbackPrefix = "stepdash.mission-completion-fallback."
     private let reminderEligibleKey = "stepdash.notification.reminderEligible"
     private let lastActiveDateKey = "stepdash.notification.lastActiveDate"
-    private let deliveryCompletionNotifiedKeyPrefix = "stepdash.delivery-completion-notified."
     private let appOpenReminderDelay: TimeInterval = 60
     
     private override init() {
@@ -27,7 +26,12 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification
     ) async -> UNNotificationPresentationOptions {
-        []
+        let identifier = notification.request.identifier
+        if isCompletionNotification(identifier) {
+            return [.banner, .sound]
+        }
+
+        return []
     }
     
     func updateReminderEligibility(hasRegisteredUser: Bool) {
@@ -150,11 +154,10 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
     }
 
     func notifyDeliveryCompletedIfNeeded(recipient: String, dayKey: Date, goalSteps: Int) {
-        let key = deliveryCompletionNotifiedKey(recipient: recipient, dayKey: dayKey, goalSteps: goalSteps)
-        guard !defaults.bool(forKey: key) else { return }
-        defaults.set(true, forKey: key)
-
-        notificationCenter.removePendingNotificationRequests(withIdentifiers: [deliveryCompletionFallbackIdentifier])
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: [
+            deliveryCompletionIdentifier,
+            deliveryCompletionFallbackIdentifier,
+        ])
 
         requestAuthorizationIfNeeded { [weak self] granted in
             guard granted else { return }
@@ -255,18 +258,23 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
             || identifier.hasPrefix(missionCompletionFallbackPrefix)
     }
 
-    private func deliveryCompletionNotifiedKey(recipient: String, dayKey: Date, goalSteps: Int) -> String {
-        let day = Calendar.current.startOfDay(for: dayKey).timeIntervalSince1970
-        return "\(deliveryCompletionNotifiedKeyPrefix)\(recipient).\(Int(day)).\(goalSteps)"
+    private func isCompletionNotification(_ identifier: String) -> Bool {
+        identifier == deliveryCompletionIdentifier
+            || identifier == deliveryCompletionFallbackIdentifier
+            || isMissionCompletionNotification(identifier)
     }
 
     private func enqueueCompletionNotification(
         identifier: String?,
         title: String,
         body: String,
-        timeInterval: TimeInterval
+        timeInterval: TimeInterval,
+        completion: ((Bool) -> Void)? = nil
     ) {
-        guard let identifier else { return }
+        guard let identifier else {
+            completion?(false)
+            return
+        }
 
         let content = UNMutableNotificationContent()
         content.title = title
@@ -287,7 +295,11 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         notificationCenter.add(request) { error in
             if let error {
                 print("Failed to schedule completion notification:", error)
+                completion?(false)
+                return
             }
+
+            completion?(true)
         }
     }
 }
