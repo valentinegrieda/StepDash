@@ -120,13 +120,13 @@ struct HomeView: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("CURRENT DELIVERY")
-                        .font(Pixel.font(12, weight: .heavy))
+                        .font(Pixel.font(12, weight: .semibold))
                         .foregroundStyle(Pixel.dOrange)
                     Text("Deliver to:")
-                        .font(Pixel.font(11, weight: .bold))
+                        .font(Pixel.font(11, weight: .regular))
                         .foregroundStyle(Pixel.dMuted)
                     Text(delivery?.recipient ?? "—")
-                        .font(Pixel.font(17, weight: .heavy))
+                        .font(Pixel.font(17, weight: .bold))
                         .foregroundStyle(Pixel.ink)
                 }
 

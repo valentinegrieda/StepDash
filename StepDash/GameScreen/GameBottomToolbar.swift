@@ -43,10 +43,6 @@ struct GameBottomToolbar: View {
             ZStack {
                 RoundedRectangle(cornerRadius: ToolbarMetrics.activeCornerRadius)
                     .fill(isSelected ? Color(red: 0.11, green: 0.28, blue: 0.39) : .clear)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: ToolbarMetrics.activeCornerRadius)
-                            .strokeBorder(isSelected ? Color(red: 0.18, green: 0.38, blue: 0.52) : .clear, lineWidth: 2)
-                    )
                     .padding(.horizontal, ToolbarMetrics.itemHorizontalInset)
 
                 VStack(spacing: 0) {

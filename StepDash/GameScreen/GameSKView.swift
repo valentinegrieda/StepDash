@@ -76,6 +76,6 @@ final class GameSKView: SKView {
               gameScene.activeToolbarItemID != itemID else { return }
 
         gameScene.activeToolbarItemID = itemID
-        gameScene.setupBottomToolbar()
+//        gameScene.setupBottomToolbar()
     }
 }

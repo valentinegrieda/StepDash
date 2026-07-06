@@ -87,7 +87,7 @@ enum ToolbarMetrics {
     static let bottomPadding: CGFloat = 14
     static let toolbarHeight: CGFloat = 82
     static let maxToolbarWidth: CGFloat = 560
-    static let itemHorizontalInset: CGFloat = 4
+    static let itemHorizontalInset: CGFloat = 8
     static let verticalPadding: CGFloat = 9
     static let buttonHeight: CGFloat = 64
     static let selectedIconSide: CGFloat = 36

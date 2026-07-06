@@ -38,7 +38,7 @@ extension GameScene {
         // Stand on the ground line where the city background meets the brick.
         let groundY = size.height - background1.size.height
         playerSprite.position = CGPoint(
-            x: size.width * 0.33,            // horizontal: 0 = left edge, 1 = right edge
+            x: size.width * 0.5,            // horizontal: 0 = left edge, 1 = right edge
             y: groundY + targetHeight * 1.9  // vertical: raise the player by increasing this
         )
 
