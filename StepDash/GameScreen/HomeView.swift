@@ -67,7 +67,7 @@ struct HomeView: View {
 
     private var topBar: some View {
         HStack(spacing: 8) {
-            // Player (fixed width — room for ~7 characters)
+            // Player
             HStack(spacing: 8) {
                 PixelIcon(name: "Head1").frame(width: 30, height: 30)
                 Text(playerName.uppercased())
@@ -116,7 +116,7 @@ struct HomeView: View {
     private var deliveryPanel: some View {
         VStack(spacing: 10) {
             HStack(alignment: .top, spacing: 12) {
-                PixelIcon(name: "Home").frame(width: 40, height: 40)
+                PixelIcon(name: "House1").frame(width: 54, height: 54)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("CURRENT DELIVERY")
@@ -155,13 +155,12 @@ struct HomeView: View {
                     ProgressTrack(fraction: fraction)
                         .frame(height: 10)
                     Text("\(stepFormatted(progressSteps)) / \(stepFormatted(delivery?.goalSteps ?? 0)) steps")
-                        .font(Pixel.font(12, weight: .heavy))
-                        .foregroundStyle(Pixel.dOrange)
+                        .font(.system(size: 12, weight: .regular))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 deliveryButton
-                    .frame(width: 104, height: 48)
+                    .frame(width: 72, height: 32)
             }
         }
         .padding(14)
