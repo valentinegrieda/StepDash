@@ -182,7 +182,22 @@ struct HomeView: View {
     private var deliveryButton: some View {
         if let delivery {
             if !delivery.isAccepted {
-                Button("ACCEPT") { DeliveryStore.accept(delivery, context: context) }
+                Button("ACCEPT") {
+                    DeliveryStore.accept(delivery, context: context)
+                    let currentSteps = delivery.progress(todaySteps: todaySteps, consumed: consumed)
+                    NotificationManager.shared.scheduleDeliveryCompletionFallback(
+                        recipient: delivery.recipient,
+                        currentSteps: currentSteps,
+                        goalSteps: delivery.goalSteps
+                    )
+                    if delivery.isComplete(todaySteps: todaySteps, consumed: consumed) {
+                        NotificationManager.shared.notifyDeliveryCompletedIfNeeded(
+                            recipient: delivery.recipient,
+                            dayKey: delivery.dayKey,
+                            goalSteps: delivery.goalSteps
+                        )
+                    }
+                }
                     .buttonStyle(DeliveryButtonStyle(fill: Pixel.dGreen, edge: Pixel.dGreenEdge, textColor: .white))
             } else {
                 Button("CLAIM") {

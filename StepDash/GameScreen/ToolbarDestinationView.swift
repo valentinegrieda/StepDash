@@ -28,6 +28,7 @@ struct ToolbarDestinationView: View {
     var accumulatedSteps: Int = 0
     var stepLength: Double = 0.7
     var onSelect: (ToolbarDestination) -> Void = { _ in }
+    var onMissionAccepted: () -> Void = {}
 
     @Environment(\.modelContext) private var context
     @Query(sort: \Mission.id) private var missions: [Mission]

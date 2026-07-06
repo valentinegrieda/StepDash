@@ -59,10 +59,6 @@ struct ContentView: View {
         .onChange(of: players.count, initial: true) { _, newCount in
             let hasRegisteredUser = newCount > 0
             NotificationManager.shared.updateReminderEligibility(hasRegisteredUser: hasRegisteredUser)
-
-            if hasRegisteredUser {
-                NotificationManager.shared.scheduleReminderIfPossible()
-            }
         }
     }
 }

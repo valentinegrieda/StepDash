@@ -8,6 +8,7 @@ struct GameContainerView: View {
     @Environment(\.modelContext) private var context
     @Query private var missions: [Mission]
     @Query private var players: [Player]
+    @Query private var deliveries: [CurrentDelivery]
 
     /// Always-on step feed for this session. Owned here (the persistent shell)
     /// so the data pipeline keeps running across every page, not just Home.
@@ -40,7 +41,8 @@ struct GameContainerView: View {
                     distance: todayDistance,
                     accumulatedSteps: session.accumulatedSteps,
                     stepLength: playerStepLength,
-                    onSelect: selectDestination
+                    onSelect: selectDestination,
+                    onMissionAccepted: evaluateStep
                 )
             }
         }
@@ -48,8 +50,12 @@ struct GameContainerView: View {
         .onAppear {
             Mission.seedIfNeeded(context: context)
             session.start()
+            evaluateStep()
         }
         .onChange(of: session.todaySteps) { _, _ in
+            evaluateStep()
+        }
+        .onChange(of: session.accumulatedSteps) { _, _ in
             evaluateStep()
         }
     }
@@ -65,17 +71,24 @@ struct GameContainerView: View {
         let distance = Double(today) * playerStepLength
         if record.steps != today { record.steps = today }
         if record.distance != distance { record.distance = distance }
+        evaluateCurrentDelivery(todaySteps: today, record: record)
 
         let now = Date()
         var completedNow = 0
 
         for mission in missions {
             mission.refreshPeriod(now: now)
-            guard mission.isAccepted, !mission.isCompleted else { continue }
+            guard mission.isAccepted else {
+                NotificationManager.shared.cancelMissionCompletionNotification(missionID: mission.id)
+                continue
+            }
+
+            guard !mission.isCompleted else { continue }
 
             if mission.isReached(todaySteps: today, accumulatedSteps: accumulated, stepLength: playerStepLength) {
                 mission.isCompleted = true
                 completedNow += 1
+                NotificationManager.shared.notifyMissionCompleted(missionID: mission.id, title: mission.title)
 
                 if let player = players.first {
                     player.coins += mission.rewardCoins
@@ -95,5 +108,16 @@ struct GameContainerView: View {
 
     private func selectDestination(_ destination: ToolbarDestination) {
         selectedDestination = destination
+    }
+
+    private func evaluateCurrentDelivery(todaySteps: Int, record: DailyStepRecord) {
+        guard let delivery = deliveries.first, delivery.isAccepted else { return }
+        guard delivery.isComplete(todaySteps: todaySteps, consumed: record.consumedSteps) else { return }
+
+        NotificationManager.shared.notifyDeliveryCompletedIfNeeded(
+            recipient: delivery.recipient,
+            dayKey: delivery.dayKey,
+            goalSteps: delivery.goalSteps
+        )
     }
 }
