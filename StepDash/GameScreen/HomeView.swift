@@ -184,12 +184,6 @@ struct HomeView: View {
             if !delivery.isAccepted {
                 Button("ACCEPT") {
                     DeliveryStore.accept(delivery, context: context)
-                    let currentSteps = delivery.progress(todaySteps: todaySteps, consumed: consumed)
-                    NotificationManager.shared.scheduleDeliveryCompletionFallback(
-                        recipient: delivery.recipient,
-                        currentSteps: currentSteps,
-                        goalSteps: delivery.goalSteps
-                    )
                     if delivery.isComplete(todaySteps: todaySteps, consumed: consumed) {
                         NotificationManager.shared.notifyDeliveryCompletedIfNeeded(
                             recipient: delivery.recipient,

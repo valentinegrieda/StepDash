@@ -17,8 +17,6 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
     private let lastActiveDateKey = "stepdash.notification.lastActiveDate"
     private let deliveryCompletionNotifiedKeyPrefix = "stepdash.delivery-completion-notified."
     private let appOpenReminderDelay: TimeInterval = 60
-    private let deliveryCompletionMinimumDelay: TimeInterval = 120
-    private let deliveryCompletionSyncBuffer: TimeInterval = 30
     
     private override init() {
         super.init()
@@ -48,6 +46,7 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
             defaults.set(Date(), forKey: lastActiveDateKey)
             clearReminder()
             clearStaleMissionCompletionNotifications()
+            clearStaleDeliveryCompletionFallbacks()
         case .background:
             scheduleReminderIfPossible()
             printNotificationDebugState()
@@ -150,27 +149,6 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         }
     }
 
-    func scheduleDeliveryCompletionFallback(recipient: String, currentSteps: Int, goalSteps: Int) {
-        guard goalSteps > 0 else { return }
-
-        let remainingSteps = max(0, goalSteps - currentSteps)
-        let walkingEstimate = (Double(remainingSteps) / 100) * 60
-        let estimatedSeconds = max(
-            deliveryCompletionMinimumDelay,
-            min(walkingEstimate + deliveryCompletionSyncBuffer, 86_400)
-        )
-
-        requestAuthorizationIfNeeded { [weak self] granted in
-            guard granted else { return }
-            self?.enqueueCompletionNotification(
-                identifier: self?.deliveryCompletionFallbackIdentifier,
-                title: "Delivery finished",
-                body: "Delivery to \(recipient) already achieved. Open StepDash to claim your reward.",
-                timeInterval: estimatedSeconds
-            )
-        }
-    }
-
     func notifyDeliveryCompletedIfNeeded(recipient: String, dayKey: Date, goalSteps: Int) {
         let key = deliveryCompletionNotifiedKey(recipient: recipient, dayKey: dayKey, goalSteps: goalSteps)
         guard !defaults.bool(forKey: key) else { return }
@@ -187,6 +165,11 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
                 timeInterval: 1
             )
         }
+    }
+
+    func clearStaleDeliveryCompletionFallbacks() {
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: [deliveryCompletionFallbackIdentifier])
+        notificationCenter.removeDeliveredNotifications(withIdentifiers: [deliveryCompletionFallbackIdentifier])
     }
 
     func printNotificationDebugState() {
