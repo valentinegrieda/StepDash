@@ -20,6 +20,11 @@ struct HomeView: View {
     private var consumed: Int {
         dayRecords.first { Calendar.current.isDate($0.date, inSameDayAs: Date()) }?.consumedSteps ?? 0
     }
+    private var deliveriesToday: Int {
+        dayRecords.first { Calendar.current.isDate($0.date, inSameDayAs: Date()) }?.deliveriesDone ?? 0
+    }
+
+    @State private var showMissions = false
 
     var body: some View {
         ZStack {
@@ -43,9 +48,21 @@ struct HomeView: View {
 
                 GameBottomToolbar(selected: selectedDestination, onSelect: onSelect)
             }
+
+            if showMissions {
+                MissionsPopup(
+                    todaySteps: todaySteps,
+                    deliveriesToday: deliveriesToday,
+                    onClose: { showMissions = false }
+                )
+                .transition(.opacity)
+                .zIndex(1)
+            }
         }
+        .animation(.easeOut(duration: 0.15), value: showMissions)
         .onAppear {
             DeliveryStore.current(for: Date(), context: context)
+            MissionStore.refresh(for: Date(), context: context)
         }
         #if DEBUG
         .overlay(alignment: .topTrailing) {
@@ -213,7 +230,7 @@ struct HomeView: View {
     private var categoryBoxes: some View {
         HStack(spacing: 10) {
             categoryBox(icon: "Trophy", title: "ACHIEVEMENTS") { }
-            categoryBox(icon: "List",  title: "MISSIONS") { onSelect(.missions) }
+            categoryBox(icon: "List",  title: "MISSIONS") { showMissions = true }
             categoryBox(icon: "Package", title: "HISTORY") { }
         }
     }

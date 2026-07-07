@@ -142,37 +142,10 @@ final class MissionBackgroundRefreshManager {
 
         evaluateCurrentDelivery(todaySteps: todaySteps, record: record, context: context)
 
-        let missions = (try? context.fetch(FetchDescriptor<Mission>())) ?? []
-        let accumulatedSteps = backgroundAccumulatedSteps(todaySteps: todaySteps)
-        var completedNow = 0
-
-        for mission in missions {
-            mission.refreshPeriod(now: now)
-
-            guard mission.isAccepted else {
-                NotificationManager.shared.cancelMissionCompletionNotification(missionID: mission.id)
-                continue
-            }
-
-            guard !mission.isCompleted else { continue }
-
-            if mission.isReached(
-                todaySteps: todaySteps,
-                accumulatedSteps: accumulatedSteps,
-                stepLength: stepLength
-            ) {
-                mission.isCompleted = true
-                completedNow += 1
-                NotificationManager.shared.notifyMissionCompleted(missionID: mission.id, title: mission.title)
-
-                player?.coins += mission.rewardCoins
-                player?.xp += mission.rewardXP
-            }
-        }
-
-        if completedNow > 0 {
-            record.deliveriesDone += completedNow
-        }
+        // Missions moved to the auto-track + claim flow (MissionsPopup), so the
+        // old background auto-grant loop is retired. The delivery completion
+        // notification above still runs.
+        _ = now
 
         if context.hasChanges {
             try? context.save()

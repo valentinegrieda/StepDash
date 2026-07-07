@@ -80,108 +80,11 @@ struct ToolbarDestinationView: View {
 
     // MARK: - Missions
 
+    // Missions now live in the Home popup (MissionsPopup). This page is unused;
+    // kept as a harmless placeholder so the .missions destination still compiles.
     private var missionContent: some View {
         VStack(spacing: 10) {
-            if missions.isEmpty {
-                toolbarRow(icon: "Map", title: "No Missions", detail: "Mission database is empty")
-            } else {
-                ForEach(missions, id: \.id) { mission in
-                    missionRow(mission)
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func missionRow(_ mission: Mission) -> some View {
-        let progress = mission.progress(todaySteps: steps, accumulatedSteps: accumulatedSteps, stepLength: stepLength)
-
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 12) {
-                Image(missionIcon(for: mission.id))
-                    .resizable()
-                    .interpolation(.none)
-                    .scaledToFit()
-                    .frame(width: 38, height: 38)
-
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(mission.title)
-                        .font(Pixel.font(15, weight: .heavy))
-                        .foregroundStyle(Pixel.ink)
-                    Text("\(mission.destination) • \(mission.goalDescription)")
-                        .font(Pixel.font(11, weight: .bold))
-                        .foregroundStyle(Pixel.textMuted)
-                }
-
-                Spacer()
-                categoryBadge(mission.category)
-            }
-
-            if mission.isCompleted {
-                HStack(spacing: 6) {
-                    Image(systemName: "checkmark.seal.fill")
-                        .foregroundStyle(Pixel.grass)
-                    Text("DELIVERED")
-                        .font(Pixel.font(12, weight: .heavy))
-                        .foregroundStyle(Pixel.grass)
-                    Spacer()
-                    rewardText(mission)
-                }
-            } else if mission.isAccepted {
-                DashboardBar(progress: progress, fill: Pixel.gem, height: 10)
-                HStack {
-                    Text(mission.progressDescription(todaySteps: steps, accumulatedSteps: accumulatedSteps, stepLength: stepLength))
-                        .font(Pixel.font(11, weight: .bold))
-                        .foregroundStyle(Pixel.textMuted)
-                    Spacer()
-                    rewardText(mission)
-                }
-            } else {
-                HStack {
-                    rewardText(mission)
-                    Spacer()
-                }
-                Button("ACCEPT DELIVERY") {
-                    mission.accept(now: Date(), todaySteps: steps, accumulatedSteps: accumulatedSteps)
-                    try? context.save()
-                }
-                .buttonStyle(PixelButtonStyle(fill: Pixel.grass))
-            }
-        }
-        .padding(12)
-        .background(.white)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Pixel.panelEdge, lineWidth: 1.5))
-    }
-
-    private func categoryBadge(_ category: MissionCategory) -> some View {
-        Text(category == .daily ? "DAILY" : "WEEKLY")
-            .font(Pixel.font(10, weight: .heavy))
-            .foregroundStyle(.white)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(Capsule().fill(category == .daily ? Pixel.purple : Pixel.gem))
-    }
-
-    private func rewardText(_ mission: Mission) -> some View {
-        HStack(spacing: 8) {
-            Label("\(mission.rewardCoins)", systemImage: "dollarsign.circle.fill")
-                .foregroundStyle(Pixel.coin)
-            Label("\(mission.rewardXP)", systemImage: "star.fill")
-                .foregroundStyle(Pixel.purple)
-        }
-        .font(Pixel.font(12, weight: .heavy))
-        .labelStyle(.titleAndIcon)
-    }
-
-    private func missionIcon(for id: Int) -> String {
-        switch id % 3 {
-        case 1:
-            return "Map"
-        case 2:
-            return "Package"
-        default:
-            return "DoublePackage"
+            toolbarRow(icon: "List", title: "Missions", detail: "Open missions from the Home screen")
         }
     }
 

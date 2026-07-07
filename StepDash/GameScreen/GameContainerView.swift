@@ -65,7 +65,6 @@ struct GameContainerView: View {
     /// (granting rewards + crediting a delivery to today's record).
     private func evaluateStep() {
         let today = session.todaySteps
-        let accumulated = session.accumulatedSteps
 
         let record = DailyStepRecord.record(for: Date(), context: context)
         let distance = Double(today) * playerStepLength
@@ -73,33 +72,10 @@ struct GameContainerView: View {
         if record.distance != distance { record.distance = distance }
         evaluateCurrentDelivery(todaySteps: today, record: record)
 
-        let now = Date()
-        var completedNow = 0
-
-        for mission in missions {
-            mission.refreshPeriod(now: now)
-            guard mission.isAccepted else {
-                NotificationManager.shared.cancelMissionCompletionNotification(missionID: mission.id)
-                continue
-            }
-
-            guard !mission.isCompleted else { continue }
-
-            if mission.isReached(todaySteps: today, accumulatedSteps: accumulated, stepLength: playerStepLength) {
-                mission.isCompleted = true
-                completedNow += 1
-                NotificationManager.shared.notifyMissionCompleted(missionID: mission.id, title: mission.title)
-
-                if let player = players.first {
-                    player.coins += mission.rewardCoins
-                    player.xp += mission.rewardXP
-                }
-            }
-        }
-
-        if completedNow > 0 {
-            record.deliveriesDone += completedNow
-        }
+        // Missions now use the design's auto-track + claim flow (see MissionsPopup),
+        // so the old accept-based auto-grant loop is retired — we only reset the
+        // daily claim state here.
+        MissionStore.refresh(for: Date(), context: context)
 
         if context.hasChanges {
             try? context.save()
