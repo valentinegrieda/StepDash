@@ -95,7 +95,7 @@ struct ProfileSetup: View {
 
             // Name field
             FieldLabel("NAME") {
-                TextField("Enter name", text: $name)
+                TextField("Max 6 characters", text: $name)
                     .font(Pixel.font(16, weight: .bold))
                     .textInputAutocapitalization(.characters)
                     .padding(12)
