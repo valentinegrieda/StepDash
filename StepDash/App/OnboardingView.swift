@@ -98,6 +98,11 @@ struct ProfileSetup: View {
                 TextField("Max 6 characters", text: $name)
                     .font(Pixel.font(16, weight: .bold))
                     .textInputAutocapitalization(.characters)
+                    .onChange(of: name) { _, newValue in
+                        if newValue.count > 6 {
+                            name = String(newValue.prefix(6))
+                        }
+                    }
                     .padding(12)
                     .background(Rectangle().fill(.white)
                         .overlay(Rectangle().strokeBorder(Pixel.ink, lineWidth: 3)))
