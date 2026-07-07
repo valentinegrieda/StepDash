@@ -146,21 +146,7 @@ struct ToolbarDestinationView: View {
     // MARK: - Profile
 
     private var profileContent: some View {
-        VStack(spacing: 12) {
-            Image("Head1")
-                .resizable()
-                .interpolation(.none)
-                .scaledToFit()
-                .frame(width: 84, height: 84)
-
-            Text(playerName)
-                .font(Pixel.font(22, weight: .heavy))
-                .foregroundStyle(Pixel.ink)
-
-            toolbarRow(icon: "Badge", title: "Courier Rank", detail: "Starter")
-            toolbarRow(icon: "Coin", title: "Coins", detail: "\(players.first?.coins ?? 0)")
-            toolbarRow(icon: "Stat", title: "XP", detail: "\(players.first?.xp ?? 0)")
-        }
+        ProfileContent(playerName: playerName)
     }
 
     // MARK: - Shared
