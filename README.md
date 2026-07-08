@@ -9,10 +9,10 @@ StepDash is a SwiftUI iOS app that turns walking activity into a pixel-art couri
 - Pixel-art game interface built with SwiftUI and SpriteKit.
 - Random daily deliveries with accept, progress, claim, and coin reward flow.
 - Daily and weekly missions based on either step count or distance.
+- History view for claimed deliveries and claimed missions.
 - Local persistence with SwiftData for player data, missions, deliveries, and daily step history.
 - Local background music from `background_music.mp3`.
 - Local reminders using `UserNotifications`.
-- Debug-only `+500 steps` button to make Simulator testing easier.
 
 ## Tech Stack
 
@@ -76,7 +76,8 @@ Current project settings:
 3. If no player exists, the app shows `OnboardingView`.
 4. If a player exists, the app opens `GameContainerView`.
 5. `GameContainerView` starts `GameSession`, records daily step updates, and evaluates missions.
-6. `HomeView` displays today's steps, coins, active delivery, delivery progress, and the bottom navigation toolbar.
+6. `HomeView` displays today's steps, coins, active delivery, delivery progress, history access, and the bottom navigation toolbar.
+7. The history popup shows deliveries and missions that have already been claimed.
 
 ## Local Data
 
@@ -86,14 +87,16 @@ The project uses SwiftData with these models:
 - `Mission`: daily/weekly mission definitions, progress state, and rewards.
 - `DailyStepRecord`: daily steps, distance, completed deliveries, and consumed steps.
 - `CurrentDelivery`: the currently active daily delivery.
+- `DeliveryHistory`: claimed delivery records.
+- `MissionHistory`: claimed mission records.
 
 Initial missions are seeded automatically through `Mission.seedIfNeeded(context:)`.
 
 ## Testing Notes
 
-- In Debug builds, the home screen shows a `+500 steps` button for simulated step progress.
 - Deliveries use a step consumption model: steps claimed for one delivery are stored as `consumedSteps`, so the next delivery uses the remaining steps for that day.
 - Daily missions use today's raw steps, while weekly missions use accumulated steps since the mission was accepted.
+- Claimed deliveries and claimed missions are saved to history so the user can review completed rewards.
 - The reminder notification currently uses a 5-second test trigger in `NotificationManager.swift`. For production behavior, switch to the `UNCalendarNotificationTrigger` already prepared in that file.
 
 ## Permissions
@@ -118,5 +121,5 @@ If the step counter does not update on a physical device, check Motion & Fitness
 
 - Add the Motion & Fitness permission string to `Info.plist`.
 - Replace the notification test trigger with the production daily schedule.
-- Complete achievements, history, shop, and profile pages if they are not fully active yet.
+- Complete achievements, shop, and profile pages if they are not fully active yet.
 - Add tests for mission, delivery, and daily step record logic.
