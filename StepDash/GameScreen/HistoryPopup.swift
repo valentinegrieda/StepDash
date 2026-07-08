@@ -111,7 +111,7 @@ struct HistoryPopup: View {
                     .foregroundStyle(Pixel.dGreen)
             }
 
-            Spacer(minLength: 8)
+            Spacer()
 
             VStack(spacing: 4) {
                 HStack(spacing: 3) {
@@ -123,8 +123,7 @@ struct HistoryPopup: View {
             }
             .fixedSize()
         }
-        .frame(minHeight: 76)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
+        .frame(height: 68)
+        .padding(.horizontal, 8)
     }
 }
