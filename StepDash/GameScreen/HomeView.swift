@@ -25,6 +25,7 @@ struct HomeView: View {
     }
 
     @State private var showMissions = false
+    @State private var showHistory = false
 
     var body: some View {
         ZStack {
@@ -54,6 +55,14 @@ struct HomeView: View {
                     todaySteps: todaySteps,
                     deliveriesToday: deliveriesToday,
                     onClose: { showMissions = false }
+                )
+                .transition(.opacity)
+                .zIndex(1)
+            }
+            
+            if showHistory {
+                HistoryPopup(
+                    onClose: { showHistory = false }
                 )
                 .transition(.opacity)
                 .zIndex(1)
@@ -231,7 +240,7 @@ struct HomeView: View {
         HStack(spacing: 10) {
             categoryBox(icon: "Trophy", title: "ACHIEVEMENTS") { }
             categoryBox(icon: "List",  title: "MISSIONS") { showMissions = true }
-            categoryBox(icon: "Package", title: "HISTORY") { }
+            categoryBox(icon: "Package", title: "HISTORY") { showHistory = true }
         }
     }
 

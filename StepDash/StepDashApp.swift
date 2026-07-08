@@ -11,6 +11,8 @@ struct StepDashApp: App {
             modelContainer = try ModelContainer(
                 for: Player.self,
                 Mission.self,
+                MissionHistory.self,
+                DeliveryHistory.self,
                 DailyStepRecord.self,
                 CurrentDelivery.self
             )

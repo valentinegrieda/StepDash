@@ -248,5 +248,5 @@ struct ToolbarDestinationView: View {
         accumulatedSteps: 7245,
         stepLength: 0.7
     )
-    .modelContainer(for: [Mission.self, Player.self, DailyStepRecord.self], inMemory: true)
-}
+    .modelContainer(for: [Mission.self, MissionHistory.self, DeliveryHistory.self, Player.self, DailyStepRecord.self],
+        inMemory: true)}

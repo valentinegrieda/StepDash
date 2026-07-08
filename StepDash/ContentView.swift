@@ -65,7 +65,7 @@ struct ContentView: View {
 
 #Preview("Home (seeded player)") {
     let container = try! ModelContainer(
-        for: Player.self, Mission.self, DailyStepRecord.self, CurrentDelivery.self,
+        for: Player.self, Mission.self, MissionHistory.self, DeliveryHistory.self, DailyStepRecord.self, CurrentDelivery.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
     container.mainContext.insert(
@@ -77,5 +77,5 @@ struct ContentView: View {
 
 #Preview("Onboarding (no player)") {
     NavigationStack { ContentView() }
-        .modelContainer(for: [Player.self, Mission.self, DailyStepRecord.self, CurrentDelivery.self], inMemory: true)
+        .modelContainer(for: [Player.self, Mission.self, MissionHistory.self, DeliveryHistory.self, DailyStepRecord.self, CurrentDelivery.self], inMemory: true)
 }

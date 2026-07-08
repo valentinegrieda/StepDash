@@ -92,6 +92,7 @@ enum MissionStore {
 
         mission.isClaimed = true
         player?.coins += mission.rewardCoins
+        context.insert(MissionHistory(mission: mission))
         try? context.save()
     }
 }

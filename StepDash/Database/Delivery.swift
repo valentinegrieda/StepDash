@@ -123,6 +123,7 @@ enum DeliveryStore {
         player?.coins += delivery.rewardCoins
         record.consumedSteps += delivery.goalSteps
         record.deliveriesDone += 1
+        context.insert(DeliveryHistory(delivery: delivery))
 
         delivery.fill(with: DeliveryCatalog.random(), dayKey: calendar.startOfDay(for: today))
         try? context.save()
