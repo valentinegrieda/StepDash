@@ -138,4 +138,41 @@ final class MotionManager {
         notify(today: lastRawSteps, accumulated: accumulatedBase + lastRawSteps)
     }
     #endif
+
+    // MARK: - Historical queries (for Stats)
+
+    /// Steps in an arbitrary interval (used for backfill + hourly Day charts).
+    /// Completion is delivered on the main thread.
+    func querySteps(from start: Date, to end: Date, completion: @escaping (Int?) -> Void) {
+        guard CMPedometer.isStepCountingAvailable(), end > start else {
+            completion(nil)
+            return
+        }
+        pedometer.queryPedometerData(from: start, to: end) { data, _ in
+            DispatchQueue.main.async { completion(data?.numberOfSteps.intValue) }
+        }
+    }
+
+    /// 24 hourly step counts for the given day (elapsed hours only; future hours = 0).
+    func queryHourlySteps(for day: Date, completion: @escaping ([Int]) -> Void) {
+        guard CMPedometer.isStepCountingAvailable() else { completion([]); return }
+
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: day)
+        let now = Date()
+        var results = [Int](repeating: 0, count: 24)
+        let group = DispatchGroup()
+
+        for hour in 0..<24 {
+            guard let from = calendar.date(byAdding: .hour, value: hour, to: startOfDay), from < now else { continue }
+            let to = min(calendar.date(byAdding: .hour, value: 1, to: from) ?? from, now)
+            group.enter()
+            pedometer.queryPedometerData(from: from, to: to) { data, _ in
+                results[hour] = data?.numberOfSteps.intValue ?? 0
+                group.leave()
+            }
+        }
+
+        group.notify(queue: .main) { completion(results) }
+    }
 }

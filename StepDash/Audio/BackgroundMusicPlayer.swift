@@ -8,7 +8,12 @@ final class BackgroundMusicPlayer {
     private init() {}
 
     func startIfNeeded() {
-        guard audioPlayer?.isPlaying != true else { return }
+        // Only ever create one player. If it already exists, just resume it (e.g.
+        // after an interruption) instead of creating a second overlapping track.
+//        if let audioPlayer {
+//            if !audioPlayer.isPlaying { audioPlayer.play() }
+//            return
+//        }
 
         do {
             try configureAudioSession()

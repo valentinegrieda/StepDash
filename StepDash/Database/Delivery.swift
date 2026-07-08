@@ -121,6 +121,7 @@ enum DeliveryStore {
         guard delivery.isComplete(todaySteps: todaySteps, consumed: record.consumedSteps) else { return }
 
         player?.coins += delivery.rewardCoins
+        record.coinsEarned += delivery.rewardCoins
         record.consumedSteps += delivery.goalSteps
         record.deliveriesDone += 1
         context.insert(DeliveryHistory(delivery: delivery))

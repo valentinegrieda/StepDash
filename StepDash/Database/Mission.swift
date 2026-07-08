@@ -92,6 +92,7 @@ enum MissionStore {
 
         mission.isClaimed = true
         player?.coins += mission.rewardCoins
+        DailyStepRecord.record(for: Date(), context: context).coinsEarned += mission.rewardCoins
         context.insert(MissionHistory(mission: mission))
         try? context.save()
     }

@@ -55,7 +55,7 @@ enum GameUIConfig {
 }
 
 enum TopSummaryMetrics {
-    static let horizontalPadding: CGFloat = 20
+    static let horizontalPadding: CGFloat = 12
     static let topPadding: CGFloat = 18
     static let gap: CGFloat = 12
     static let cardHeight: CGFloat = 70

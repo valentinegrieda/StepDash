@@ -64,6 +64,7 @@ struct GameContainerView: View {
             Mission.seedIfNeeded(context: context)
             session.start()
             evaluateStep()
+            StatsBackfill.run(context: context, stepLength: playerStepLength)
             voiceControl.onCommand = handleVoiceCommand
         }
         .onDisappear {

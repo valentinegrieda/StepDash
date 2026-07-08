@@ -42,7 +42,15 @@ struct ToolbarDestinationView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 14) {
-                    destinationPanel
+                    if destination == .stats {
+                        StatsView()
+                    } else {
+                        DashboardPanel(title: destination.title) {
+                            VStack(spacing: 10) {
+                                destinationContent
+                            }
+                        }
+                    }
                 }
                 .frame(maxWidth: TopSummaryMetrics.maxContentWidth)
                 .padding(.horizontal, TopSummaryMetrics.horizontalPadding)
@@ -100,20 +108,7 @@ struct ToolbarDestinationView: View {
     // MARK: - Stats
 
     private var statsContent: some View {
-        let totals = DailyStepRecord.lifetimeTotals(context: context)
-
-        return VStack(spacing: 14) {
-            statBlock(title: "TODAY", value: "\(steps) steps", progress: stepProgress)
-            statBlock(title: "DISTANCE", value: "\(formattedDistance)m", progress: distanceProgress)
-
-            InsetCard {
-                totalRow(title: "TOTAL STEPS", value: "\(totals.steps)")
-                Divider()
-                totalRow(title: "TOTAL DISTANCE", value: String(format: "%.0f m", totals.distance))
-                Divider()
-                totalRow(title: "DELIVERIES DONE", value: "\(totals.deliveries)")
-            }
-        }
+        StatsView()
     }
 
     private func totalRow(title: String, value: String) -> some View {

@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import Foundation
 
 @main
 struct StepDashApp: App {
@@ -7,18 +8,30 @@ struct StepDashApp: App {
     private let modelContainer: ModelContainer
 
     init() {
+        let schema = Schema([Player.self, Mission.self, DailyStepRecord.self, CurrentDelivery.self])
+        let configuration = ModelConfiguration(schema: schema)
+
         do {
-            modelContainer = try ModelContainer(
-                for: Player.self,
-                Mission.self,
-                MissionHistory.self,
-                DeliveryHistory.self,
-                DailyStepRecord.self,
-                CurrentDelivery.self
-            )
-            MissionBackgroundRefreshManager.shared.configure(modelContainer: modelContainer)
+            modelContainer = try ModelContainer(for: schema, configurations: configuration)
         } catch {
-            fatalError("Failed to create model container: \(error)")
+            // The on-disk store is incompatible with the current schema — this
+            // happens in development when a @Model changes shape. Wipe the stale
+            // store and rebuild it fresh instead of crashing.
+            StepDashApp.deleteStore(at: configuration.url)
+            do {
+                modelContainer = try ModelContainer(for: schema, configurations: configuration)
+            } catch {
+                fatalError("Failed to create model container: \(error)")
+            }
+        }
+
+        MissionBackgroundRefreshManager.shared.configure(modelContainer: modelContainer)
+    }
+
+    private static func deleteStore(at url: URL) {
+        let fileManager = FileManager.default
+        for suffix in ["", "-wal", "-shm"] {
+            try? fileManager.removeItem(at: URL(fileURLWithPath: url.path + suffix))
         }
     }
 
