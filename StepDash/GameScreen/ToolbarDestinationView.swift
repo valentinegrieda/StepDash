@@ -42,11 +42,7 @@ struct ToolbarDestinationView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 14) {
-                    DashboardPanel(title: destination.title) {
-                        VStack(spacing: 10) {
-                            destinationContent
-                        }
-                    }
+                    destinationPanel
                 }
                 .frame(maxWidth: TopSummaryMetrics.maxContentWidth)
                 .padding(.horizontal, TopSummaryMetrics.horizontalPadding)
@@ -59,6 +55,19 @@ struct ToolbarDestinationView: View {
                 GameBottomToolbar(selected: selectedDestination, onSelect: onSelect)
             }
             .ignoresSafeArea(.keyboard, edges: .bottom)
+        }
+    }
+
+    @ViewBuilder
+    private var destinationPanel: some View {
+        if destination == .shop {
+            shopPanel
+        } else {
+            DashboardPanel(title: destination.title) {
+                VStack(spacing: 10) {
+                    destinationContent
+                }
+            }
         }
     }
 
@@ -135,12 +144,43 @@ struct ToolbarDestinationView: View {
 
     // MARK: - Shop
 
-    private var shopContent: some View {
-        VStack(spacing: 10) {
-            toolbarRow(icon: "Shoe", title: "Speed Shoes", detail: "120 coins")
-            toolbarRow(icon: "Gift", title: "Reward Box", detail: "80 coins")
-            toolbarRow(icon: "Gear", title: "Courier Gear", detail: "150 coins")
+    private var shopPanel: some View {
+        VStack(spacing: 0) {
+            Text("SHOP")
+                .font(Pixel.font(28, weight: .heavy))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(Pixel.purple)
+
+            VStack(spacing: 14) {
+                HStack(spacing: 12) {
+                    PixelIcon(name: "Package")
+                        .frame(width: 38, height: 38)
+
+                    Text("Coming Soon!")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundStyle(.black)
+                }
+
+                Text("This feature is still being delivered.")
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(.black)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 22)
+            .background(.white)
         }
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color.black.opacity(0.08), lineWidth: 1))
+        .shadow(color: .black.opacity(0.35), radius: 4, x: 0, y: 3)
+    }
+
+    private var shopContent: some View {
+        shopPanel
     }
 
     // MARK: - Profile

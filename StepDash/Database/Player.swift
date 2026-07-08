@@ -1,6 +1,14 @@
 import Foundation
 import SwiftData
 
+enum PlayerNameRules {
+    static let maxLength = 10
+
+    static func limited(_ name: String) -> String {
+        String(name.prefix(maxLength))
+    }
+}
+
 @Model
 final class Player {
     var name: String

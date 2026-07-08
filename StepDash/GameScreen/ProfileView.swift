@@ -181,10 +181,12 @@ struct ProfileContent: View {
                     .background(RoundedRectangle(cornerRadius: 8).fill(.white))
                     .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Pixel.dWhiteEdge, lineWidth: 2))
                     .onChange(of: draftName) { _, newValue in
-                        if newValue.count > 6 { draftName = String(newValue.prefix(6)) }
+                        if newValue.count > PlayerNameRules.maxLength {
+                            draftName = PlayerNameRules.limited(newValue)
+                        }
                     }
 
-                Text("MAX 6 CHARACTERS")
+                Text("MAX \(PlayerNameRules.maxLength) CHARACTERS")
                     .font(Pixel.font(10, weight: .bold))
                     .foregroundStyle(Pixel.dMuted)
 
@@ -292,7 +294,7 @@ struct ProfileContent: View {
     private func saveName() {
         let trimmed = draftName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty, let player else { return }
-        player.name = String(trimmed.prefix(6))
+        player.name = PlayerNameRules.limited(trimmed)
         try? context.save()
     }
 

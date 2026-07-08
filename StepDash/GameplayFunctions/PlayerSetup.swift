@@ -22,7 +22,7 @@ extension OnboardingView {
         
         
         let newPlayer = Player(
-            name: name,
+            name: PlayerNameRules.limited(name),
             gender: gender,
             height: heightCm,
             stepLength: stepLength

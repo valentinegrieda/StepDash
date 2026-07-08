@@ -63,7 +63,7 @@ Current structure:
 - Scrolling pixel background.
 - Logo at the top.
 - `ProfileSetup` panel.
-- Name field with max 6 characters.
+- Name field with max 10 characters.
 - Gender segmented buttons.
 - Height stepper.
 - Start button.
@@ -188,7 +188,7 @@ Buttons should have a visible state change:
 - Use short labels: `START`, `ACCEPT`, `CLAIM`, `MISSIONS`.
 - Use uppercase for HUD labels.
 - Keep explanatory text out of the main gameplay screen.
-- Use helper text only where the user needs input constraints, such as `Max 6 characters`.
+- Use helper text only where the user needs input constraints, such as `Max 10 characters`.
 
 ## Assets
 

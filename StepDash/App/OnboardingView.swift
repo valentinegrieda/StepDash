@@ -95,12 +95,12 @@ struct ProfileSetup: View {
 
             // Name field
             FieldLabel("NAME") {
-                TextField("Max 6 characters", text: $name)
+                TextField("Max \(PlayerNameRules.maxLength) characters", text: $name)
                     .font(Pixel.font(16, weight: .bold))
                     .textInputAutocapitalization(.characters)
                     .onChange(of: name) { _, newValue in
-                        if newValue.count > 6 {
-                            name = String(newValue.prefix(6))
+                        if newValue.count > PlayerNameRules.maxLength {
+                            name = PlayerNameRules.limited(newValue)
                         }
                     }
                     .padding(12)
