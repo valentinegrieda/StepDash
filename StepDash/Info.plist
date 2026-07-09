@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>StepDash uses the microphone to listen for voice commands like opening stats, accepting deliveries, and claiming rewards.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>StepDash uses speech recognition to turn your spoken commands into in-app actions.</string>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.valentinegrieda.StepDash.mission-refresh</string>

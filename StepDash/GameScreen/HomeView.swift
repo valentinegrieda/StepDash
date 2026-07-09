@@ -7,6 +7,8 @@ struct HomeView: View {
     let stepLength: Double
     var session: GameSession
     let selectedDestination: ToolbarDestination
+    @Binding var showMissions: Bool
+    @Binding var showHistory: Bool
     var onSelect: (ToolbarDestination) -> Void
 
     @Environment(\.modelContext) private var context
@@ -23,9 +25,6 @@ struct HomeView: View {
     private var deliveriesToday: Int {
         dayRecords.first { Calendar.current.isDate($0.date, inSameDayAs: Date()) }?.deliveriesDone ?? 0
     }
-
-    @State private var showMissions = false
-    @State private var showHistory = false
 
     var body: some View {
         ZStack {
