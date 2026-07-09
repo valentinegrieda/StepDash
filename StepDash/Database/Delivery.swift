@@ -17,7 +17,8 @@ enum DeliveryCatalog {
         DeliveryTemplate(recipient: "Kenji", goalSteps: 3_000, rewardCoins: 30),
         DeliveryTemplate(recipient: "Amara", goalSteps: 4_500, rewardCoins: 45),
         DeliveryTemplate(recipient: "Liam",  goalSteps: 2_000, rewardCoins: 20),
-        DeliveryTemplate(recipient: "Sofia", goalSteps: 6_000, rewardCoins: 60),
+        DeliveryTemplate(recipient: "Sofia", goalSteps: 3_000, rewardCoins: 30),
+        DeliveryTemplate(recipient: "Alan", goalSteps: 1_000, rewardCoins: 10),
     ]
 
     static func random() -> DeliveryTemplate {

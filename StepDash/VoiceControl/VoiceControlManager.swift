@@ -7,6 +7,7 @@ enum VoiceCommand: Equatable {
     case destination(ToolbarDestination)
     case openMissions
     case openHistory
+    case openAchievements
     case closePopup
     case acceptDelivery
     case claimDelivery
@@ -203,6 +204,10 @@ private enum VoiceCommandParser {
             return .openHistory
         }
 
+        if containsAny(phrase, ["achievement", "achievements", "pencapaian"]) {
+            return .openAchievements
+        }
+
         if containsAny(phrase, ["home", "rumah", "beranda"]) {
             return .destination(.home)
         }
@@ -230,6 +235,8 @@ private enum VoiceCommandParser {
             return "Missions"
         case .openHistory:
             return "History"
+        case .openAchievements:
+            return "Achievements"
         case .closePopup:
             return "Close"
         case .acceptDelivery:

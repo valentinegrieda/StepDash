@@ -17,6 +17,7 @@ struct GameContainerView: View {
     @StateObject private var voiceControl = VoiceControlManager()
     @State private var showMissions = false
     @State private var showHistory = false
+    @State private var showAchievements = false
 
     // The persisted Player is the source of truth for name + step length,
     // falling back to the values passed in if the query hasn't resolved yet.
@@ -39,6 +40,7 @@ struct GameContainerView: View {
                         selectedDestination: selectedDestination,
                         showMissions: $showMissions,
                         showHistory: $showHistory,
+                        showAchievements: $showAchievements,
                         isVoiceListening: voiceControl.isListening,
                         onVoiceToggle: voiceControl.toggleListening,
                         onSelect: selectDestination
@@ -123,11 +125,18 @@ struct GameContainerView: View {
         case .openMissions:
             selectedDestination = .home
             showHistory = false
+            showAchievements = false
             showMissions = true
         case .openHistory:
             selectedDestination = .home
             showMissions = false
+            showAchievements = false
             showHistory = true
+        case .openAchievements:
+            selectedDestination = .home
+            showMissions = false
+            showHistory = false
+            showAchievements = true
         case .closePopup:
             closePopups()
         case .acceptDelivery:
@@ -142,6 +151,7 @@ struct GameContainerView: View {
     private func closePopups() {
         showMissions = false
         showHistory = false
+        showAchievements = false
     }
 
     private func acceptCurrentDelivery() {

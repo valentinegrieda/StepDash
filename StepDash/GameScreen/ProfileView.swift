@@ -305,7 +305,16 @@ struct ProfileContent: View {
         try? context.delete(model: CurrentDelivery.self)
         try? context.delete(model: DailyStepRecord.self)
         try? context.delete(model: Mission.self)
+        try? context.delete(model: MissionHistory.self)
+        try? context.delete(model: DeliveryHistory.self)
+        MotionManager.shared.reset()
         try? context.save()
+
+        // Resetting swaps the game view out for onboarding, which can pause the
+        // background music — resume it (no restart) after the view rebuilds.
+        DispatchQueue.main.async {
+            BackgroundMusicPlayer.shared.resumeIfPaused()
+        }
     }
 }
 

@@ -9,6 +9,7 @@ struct HomeView: View {
     let selectedDestination: ToolbarDestination
     @Binding var showMissions: Bool
     @Binding var showHistory: Bool
+    @Binding var showAchievements: Bool
     let isVoiceListening: Bool
     var onVoiceToggle: () -> Void
     var onSelect: (ToolbarDestination) -> Void
@@ -75,8 +76,17 @@ struct HomeView: View {
                 .transition(.opacity)
                 .zIndex(1)
             }
+
+            if showAchievements {
+                AchievementsPopup(
+                    onClose: { showAchievements = false }
+                )
+                .transition(.opacity)
+                .zIndex(1)
+            }
         }
         .animation(.easeOut(duration: 0.15), value: showMissions)
+        .animation(.easeOut(duration: 0.15), value: showAchievements)
         .onAppear {
             DeliveryStore.current(for: Date(), context: context)
             MissionStore.refresh(for: Date(), context: context)
@@ -273,7 +283,7 @@ struct HomeView: View {
 
     private var categoryBoxes: some View {
         HStack(spacing: 10) {
-            categoryBox(icon: "Trophy", title: "ACHIEVEMENTS") { }
+            categoryBox(icon: "Trophy", title: "ACHIEVEMENTS") { showAchievements = true }
             categoryBox(icon: "List",  title: "MISSIONS") { showMissions = true }
             categoryBox(icon: "Package", title: "HISTORY") { showHistory = true }
         }

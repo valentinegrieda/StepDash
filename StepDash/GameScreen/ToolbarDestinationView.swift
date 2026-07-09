@@ -45,11 +45,7 @@ struct ToolbarDestinationView: View {
                     if destination == .stats {
                         StatsView()
                     } else {
-                        DashboardPanel(title: destination.title) {
-                            VStack(spacing: 10) {
-                                destinationContent
-                            }
-                        }
+                        destinationPanel
                     }
                 }
                 .frame(maxWidth: TopSummaryMetrics.maxContentWidth)
@@ -70,6 +66,8 @@ struct ToolbarDestinationView: View {
     private var destinationPanel: some View {
         if destination == .shop {
             shopPanel
+        } else if destination == .profile {
+            profilePanel
         } else {
             DashboardPanel(title: destination.title) {
                 VStack(spacing: 10) {
@@ -142,7 +140,7 @@ struct ToolbarDestinationView: View {
     private var shopPanel: some View {
         VStack(spacing: 0) {
             Text("SHOP")
-                .font(Pixel.font(28, weight: .heavy))
+                .font(Pixel.font(28, weight: .bold))
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 52)
@@ -182,6 +180,26 @@ struct ToolbarDestinationView: View {
 
     private var profileContent: some View {
         ProfileContent(playerName: playerName)
+    }
+
+    // Self-contained card (matches Stats/Shop) instead of the shared DashboardPanel.
+    private var profilePanel: some View {
+        VStack(spacing: 0) {
+            Text("PROFILE")
+                .font(Pixel.font(28, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(Pixel.purple)
+
+            ProfileContent(playerName: playerName)
+                .padding(16)
+                .frame(maxWidth: .infinity)
+                .background(Color(hex: 0xF9F8F6))
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color.black.opacity(0.08), lineWidth: 1))
+        .shadow(color: .black.opacity(0.35), radius: 4, x: 0, y: 3)
     }
 
     // MARK: - Shared
