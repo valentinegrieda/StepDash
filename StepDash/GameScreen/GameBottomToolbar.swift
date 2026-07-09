@@ -49,7 +49,7 @@ struct GameBottomToolbar: View {
                     icon(item, isSelected: isSelected)
 
                     Text(item.title)
-                        .font(.custom("AvenirNext-Heavy", size: ToolbarMetrics.titleFontSize))
+                        .font(Pixel.font(ToolbarMetrics.titleFontSize, weight: .heavy))
                         .foregroundStyle(isSelected ? .yellow : .white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)

@@ -1,6 +1,7 @@
 import SpriteKit
 import SwiftUI
 import Foundation
+import UIKit
 
 class GameScene: SKScene {
 
@@ -18,6 +19,12 @@ class GameScene: SKScene {
     // Brick strip under the city background (scrolls with it).
     let brick1 = SKSpriteNode(imageNamed: "Brick")
     let brick2 = SKSpriteNode(imageNamed: "Brick")
+
+    // MARK: - UI
+    let playerNameLabel = SKLabelNode(fontNamed: UIFont.systemFont(ofSize: 17, weight: .bold).fontName)
+    let stepLabel  = SKLabelNode(fontNamed: UIFont.systemFont(ofSize: 17, weight: .bold).fontName)
+    let distanceLabel = SKLabelNode(fontNamed: UIFont.systemFont(ofSize: 17, weight: .bold).fontName)
+    let bottomToolbar = SKNode()
 
     // MARK: - CONFIG
     var playerName: String
