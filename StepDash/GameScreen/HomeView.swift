@@ -91,20 +91,20 @@ struct HomeView: View {
             DeliveryStore.current(for: Date(), context: context)
             MissionStore.refresh(for: Date(), context: context)
         }
-        #if DEBUG
-        .overlay(alignment: .topTrailing) {
-            Button("+500 steps") {
-                MotionManager.shared.debugAddSteps(500)
-            }
-            .font(Pixel.font(11, weight: .heavy))
-            .foregroundStyle(.white)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(Capsule().fill(Color.black.opacity(0.55)))
-            .padding(.top, 72)
-            .padding(.trailing, 16)
-        }
-        #endif
+//        #if DEBUG
+//        .overlay(alignment: .topTrailing) {
+//            Button("+500 steps") {
+//                MotionManager.shared.debugAddSteps(500)
+//            }
+//            .font(Pixel.font(11, weight: .heavy))
+//            .foregroundStyle(.white)
+//            .padding(.horizontal, 10)
+//            .padding(.vertical, 6)
+//            .background(Capsule().fill(Color.black.opacity(0.55)))
+//            .padding(.top, 72)
+//            .padding(.trailing, 16)
+//        }
+//        #endif
     }
 
     // MARK: - Top bar

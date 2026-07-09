@@ -48,14 +48,4 @@ extension DailyStepRecord {
         context.insert(created)
         return created
     }
-
-    /// Totals across every recorded day ("since playing").
-    static func lifetimeTotals(context: ModelContext) -> (steps: Int, distance: Double, deliveries: Int) {
-        let all = (try? context.fetch(FetchDescriptor<DailyStepRecord>())) ?? []
-        return (
-            all.reduce(0) { $0 + $1.steps },
-            all.reduce(0) { $0 + $1.distance },
-            all.reduce(0) { $0 + $1.deliveriesDone }
-        )
-    }
 }

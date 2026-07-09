@@ -9,13 +9,6 @@ import SwiftUI
 import SwiftData
 import UIKit
 
-struct ToolbarDestinationPresentation: Identifiable {
-    let id = UUID()
-    let destination: ToolbarDestination
-    let steps: Int
-    let distance: Double
-}
-
 struct ToolbarDestinationView: View {
     let destination: ToolbarDestination
     let selectedDestination: ToolbarDestination
@@ -109,32 +102,6 @@ struct ToolbarDestinationView: View {
         StatsView()
     }
 
-    private func totalRow(title: String, value: String) -> some View {
-        HStack {
-            Text(title)
-                .font(Pixel.font(12, weight: .heavy))
-                .foregroundStyle(Pixel.textMuted)
-            Spacer()
-            Text(value)
-                .font(Pixel.font(14, weight: .heavy))
-                .foregroundStyle(Pixel.ink)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-    }
-
-    private var formattedDistance: String {
-        String(format: "%.2f", distance)
-    }
-
-    private var stepProgress: Double {
-        min(Double(steps) / 12_000, 1)
-    }
-
-    private var distanceProgress: Double {
-        min(distance / 8_000, 1)
-    }
-
     // MARK: - Shop
 
     private var shopPanel: some View {
@@ -223,26 +190,6 @@ struct ToolbarDestinationView: View {
             }
 
             Spacer()
-        }
-        .padding(12)
-        .background(.white)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Pixel.panelEdge, lineWidth: 1.5))
-    }
-
-    private func statBlock(title: String, value: String, progress: Double) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(title)
-                    .font(Pixel.font(12, weight: .heavy))
-                    .foregroundStyle(Pixel.textMuted)
-                Spacer()
-                Text(value)
-                    .font(Pixel.font(14, weight: .heavy))
-                    .foregroundStyle(Pixel.ink)
-            }
-
-            DashboardBar(progress: progress, fill: Pixel.grass, height: 12)
         }
         .padding(12)
         .background(.white)

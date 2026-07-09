@@ -19,17 +19,10 @@ class GameScene: SKScene {
     let brick1 = SKSpriteNode(imageNamed: "Brick")
     let brick2 = SKSpriteNode(imageNamed: "Brick")
 
-    // MARK: - UI
-    let playerNameLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    let stepLabel  = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    let distanceLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    let bottomToolbar = SKNode()
-
     // MARK: - CONFIG
     var playerName: String
     var stepLength: Double
     var distance: Double = 0
-    var onToolbarItemSelected: ((String, Int, Double) -> Void)?
 
     // MARK: - STATE
     var lastStepCount: Int = 0
@@ -37,7 +30,6 @@ class GameScene: SKScene {
     var pendingStepAnimations = 0
     var isAnimatingDetectedStep = false
     var nextStepStartsWithLeadingLeftFoot = true
-    var activeToolbarItemID: String = "home"
 
     // MARK: - INIT
     init(size: CGSize, playerName: String, stepLength: Double) {
