@@ -9,6 +9,8 @@ struct HomeView: View {
     let selectedDestination: ToolbarDestination
     @Binding var showMissions: Bool
     @Binding var showHistory: Bool
+    let isVoiceListening: Bool
+    var onVoiceToggle: () -> Void
     var onSelect: (ToolbarDestination) -> Void
 
     @Environment(\.modelContext) private var context
@@ -39,6 +41,13 @@ struct HomeView: View {
                     .padding(.top, 8)
 
                 Spacer(minLength: 0)
+
+                HStack {
+                    Spacer()
+                    voiceControlButton
+                }
+                .padding(.horizontal, 12)
+                .padding(.bottom, -2)
 
                 deliveryPanel
                     .padding(.horizontal, 12)
@@ -137,6 +146,33 @@ struct HomeView: View {
     }
 
     // MARK: - Delivery panel
+
+    private var voiceControlButton: some View {
+        Button {
+            onVoiceToggle()
+        } label: {
+            HStack(spacing: 5) {
+                Image(systemName: isVoiceListening ? "mic.fill" : "mic")
+                    .font(.system(size: 14, weight: .heavy))
+
+                Text(isVoiceListening ? "VOICE ON" : "VOICE")
+                    .font(Pixel.font(9, weight: .heavy))
+            }
+            .foregroundStyle(.white)
+            .frame(width: 86, height: 34)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isVoiceListening ? Pixel.dGreen : Pixel.dNavy)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .strokeBorder(.white.opacity(0.65), lineWidth: 2)
+            )
+            .shadow(color: .black.opacity(0.28), radius: 3, x: 0, y: 2)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(isVoiceListening ? "Turn voice control off" : "Turn voice control on")
+    }
 
     private var deliveryPanel: some View {
         VStack(spacing: 10) {

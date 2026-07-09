@@ -39,6 +39,8 @@ struct GameContainerView: View {
                         selectedDestination: selectedDestination,
                         showMissions: $showMissions,
                         showHistory: $showHistory,
+                        isVoiceListening: voiceControl.isListening,
+                        onVoiceToggle: voiceControl.toggleListening,
                         onSelect: selectDestination
                     )
                 } else {
@@ -56,7 +58,6 @@ struct GameContainerView: View {
                 }
             }
 
-            voiceControlOverlay
         }
         .animation(.easeOut(duration: 0.18), value: selectedDestination)
         .onAppear {
@@ -111,41 +112,6 @@ struct GameContainerView: View {
             dayKey: delivery.dayKey,
             goalSteps: delivery.goalSteps
         )
-    }
-
-    private var voiceControlOverlay: some View {
-        VStack {
-            Spacer()
-            HStack {
-                Spacer()
-                Button {
-                    voiceControl.toggleListening()
-                } label: {
-                    VStack(spacing: 4) {
-                        Image(systemName: voiceControl.isListening ? "mic.fill" : "mic")
-                            .font(.system(size: 18, weight: .heavy))
-                        Text(voiceControl.isListening ? "VOICE ON" : "VOICE")
-                            .font(Pixel.font(9, weight: .heavy))
-                    }
-                    .foregroundStyle(.white)
-                    .frame(width: 74, height: 56)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(voiceControl.isListening ? Pixel.dGreen : Pixel.dNavy)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .strokeBorder(.white.opacity(0.65), lineWidth: 2)
-                    )
-                    .shadow(color: .black.opacity(0.28), radius: 4, x: 0, y: 2)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(voiceControl.isListening ? "Turn voice control off" : "Turn voice control on")
-                .padding(.trailing, 16)
-                .padding(.bottom, 104)
-            }
-        }
-        .allowsHitTesting(true)
     }
 
     private func handleVoiceCommand(_ command: VoiceCommand) {
