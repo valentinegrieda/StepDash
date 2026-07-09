@@ -37,8 +37,14 @@ enum Pixel {
                        startPoint: .top, endPoint: .bottom)
     }
 
-    /// Retro monospaced face. Swap `name` for a bundled pixel TTF when added.
+    /// App-wide text face. SwiftUI's default system font resolves to SF Pro on iOS.
     static func font(_ size: CGFloat, weight: Font.Weight = .bold) -> Font {
+        .system(size: size, weight: weight)
+    }
+
+    /// Onboarding keeps the original pixel/monospaced feel while the rest of the
+    /// app uses SF Pro.
+    static func onboardingFont(_ size: CGFloat, weight: Font.Weight = .bold) -> Font {
         .system(size: size, weight: weight, design: .monospaced)
     }
 }
@@ -192,10 +198,11 @@ extension View {
 struct PixelButtonStyle: ButtonStyle {
     var fill: Color = Pixel.red
     var textColor: Color = .white
+    var labelFont: Font = Pixel.font(16, weight: .heavy)
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Pixel.font(16, weight: .heavy))
+            .font(labelFont)
             .foregroundStyle(textColor)
             .padding(.vertical, 14)
             .padding(.horizontal, 22)

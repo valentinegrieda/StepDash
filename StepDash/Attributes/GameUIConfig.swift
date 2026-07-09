@@ -90,10 +90,10 @@ enum ToolbarMetrics {
     static let itemHorizontalInset: CGFloat = 8
     static let verticalPadding: CGFloat = 9
     static let buttonHeight: CGFloat = 64
-    static let selectedIconSide: CGFloat = 36
-    static let iconSide: CGFloat = 32
-    static let iconFrameHeight: CGFloat = 36
-    static let titleHeight: CGFloat = 18
+    static let selectedIconSide: CGFloat = 40
+    static let iconSide: CGFloat = 40
+    static let iconFrameHeight: CGFloat = 40
+    static let titleHeight: CGFloat = 16
     static let titleFontSize: CGFloat = 12
     static let cornerRadius: CGFloat = 8
     static let activeCornerRadius: CGFloat = 8

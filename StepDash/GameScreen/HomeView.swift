@@ -113,44 +113,50 @@ struct HomeView: View {
         HStack(spacing: 8) {
             // Player
             HStack(spacing: 8) {
-                PixelIcon(name: "Head1").frame(width: 30, height: 30)
+                PixelIcon(name: "Head1").frame(width: 40, height: 40)
                 Text(playerName.uppercased())
-                    .font(Pixel.font(13, weight: .heavy))
+                    .font(Pixel.font(12, weight: .heavy))
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .truncationMode(.tail)
+                    .frame(height: 16, alignment: .center)
             }
             .padding(.horizontal, 12)
             .frame(width: 120, height: 52)
             .pixelBox(fill: Pixel.dNavy, stroke: Pixel.dNavyEdge)
 
             // Today's steps
-            HStack(spacing: 8) {
-                PixelIcon(name: "Shoe").frame(width: 30, height: 30)
+            HStack(spacing: 6) {
+                PixelIcon(name: "Shoe").frame(width: 40, height: 40)
                 VStack(alignment: .leading, spacing: 1) {
                     Text("TODAY'S STEPS")
-                        .font(Pixel.font(9, weight: .bold))
+                        .font(Pixel.font(11, weight: .bold))
                         .foregroundStyle(Pixel.dMuted)
+                        .lineLimit(1)
+                        .allowsTightening(true)
+                        .fixedSize(horizontal: true, vertical: false)
+                        .frame(height: 13, alignment: .center)
                     Text(stepFormatted(todaySteps))
                         .font(Pixel.font(18, weight: .heavy))
                         .foregroundStyle(Pixel.ink)
                 }
+                .layoutPriority(1)
             }
-            .padding(.horizontal, 12)
+            .padding(.horizontal, 8)
             .frame(maxWidth: .infinity)
             .frame(height: 52)
             .pixelBox(fill: .white, stroke: Pixel.dWhiteEdge)
 
-            // Coins (fixed width — room for 4 digits)
-            HStack(spacing: 6) {
+            // Coins
+            VStack(spacing: 1) {
                 PixelIcon(name: "Coin").frame(width: 24, height: 24)
                 Text(stepFormatted(coins))
                     .font(Pixel.font(15, weight: .heavy))
                     .foregroundStyle(Pixel.ink)
                     .lineLimit(1)
             }
-            .padding(.horizontal, 12)
-            .frame(width: 100, height: 52)
+            .padding(.horizontal, 8)
+            .frame(width: 72, height: 52)
             .pixelBox(fill: .white, stroke: Pixel.dWhiteEdge)
         }
     }
@@ -298,6 +304,7 @@ struct HomeView: View {
                     .foregroundStyle(Pixel.ink)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
+                    .frame(height: 16, alignment: .center)
             }
             .frame(maxWidth: .infinity)
             .padding(.bottom, 8)
@@ -330,8 +337,9 @@ private struct DeliveryButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Pixel.font(14, weight: .heavy))
+            .font(Pixel.font(12, weight: .semibold))
             .foregroundStyle(textColor)
+            .frame(height: 16, alignment: .center)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(RoundedRectangle(cornerRadius: 8).fill(fill))
             .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(edge, lineWidth: 2))

@@ -90,13 +90,13 @@ struct ProfileSetup: View {
     var body: some View {
         VStack(spacing: 18) {
             Text("CREATE YOUR COURIER")
-                .font(Pixel.font(14, weight: .heavy))
+                .font(Pixel.onboardingFont(14, weight: .heavy))
                 .foregroundStyle(Pixel.ink)
 
             // Name field
             FieldLabel("NAME") {
                 TextField("Max \(PlayerNameRules.maxLength) characters", text: $name)
-                    .font(Pixel.font(16, weight: .bold))
+                    .font(Pixel.onboardingFont(16, weight: .bold))
                     .textInputAutocapitalization(.characters)
                     .onChange(of: name) { _, newValue in
                         if newValue.count > PlayerNameRules.maxLength {
@@ -116,7 +116,7 @@ struct ProfileSetup: View {
                             HStack(spacing: 8) {
                                 Image(systemName: Gender.symbol(for: option))
                                 Text(Gender.title(for: option))
-                                    .font(Pixel.font(13, weight: .heavy))
+                                    .font(Pixel.onboardingFont(13, weight: .heavy))
                             }
                             .foregroundStyle(gender == option ? .white : Pixel.ink)
                             .frame(maxWidth: .infinity)
@@ -137,7 +137,10 @@ struct ProfileSetup: View {
             }
 
             Button("START", action: onStart)
-                .buttonStyle(PixelButtonStyle(fill: Pixel.grass))
+                .buttonStyle(PixelButtonStyle(
+                    fill: Pixel.grass,
+                    labelFont: Pixel.onboardingFont(16, weight: .heavy)
+                ))
                 .disabled(!nameValid)
                 .opacity(nameValid ? 1 : 0.5)
         }
@@ -161,7 +164,7 @@ struct FieldLabel<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .font(Pixel.font(11, weight: .bold))
+                .font(Pixel.onboardingFont(11, weight: .bold))
                 .foregroundStyle(Pixel.ink.opacity(0.7))
             content()
         }
@@ -179,7 +182,7 @@ struct PixelStepper: View {
         HStack(spacing: 0) {
             stepButton("−") { value = max(range.lowerBound, value - step) }
             Text("\(value) \(unit)")
-                .font(Pixel.font(16, weight: .heavy))
+                .font(Pixel.onboardingFont(16, weight: .heavy))
                 .foregroundStyle(Pixel.ink)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
@@ -192,7 +195,7 @@ struct PixelStepper: View {
     private func stepButton(_ symbol: String, _ action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(symbol)
-                .font(Pixel.font(22, weight: .heavy))
+                .font(Pixel.onboardingFont(22, weight: .heavy))
                 .foregroundStyle(.white)
                 .frame(width: 52)
                 .padding(.vertical, 12)

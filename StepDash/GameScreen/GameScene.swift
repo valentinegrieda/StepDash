@@ -1,6 +1,7 @@
 import SpriteKit
 import SwiftUI
 import Foundation
+import UIKit
 
 class GameScene: SKScene {
 
@@ -20,9 +21,9 @@ class GameScene: SKScene {
     let brick2 = SKSpriteNode(imageNamed: "Brick")
 
     // MARK: - UI
-    let playerNameLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    let stepLabel  = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    let distanceLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    let playerNameLabel = SKLabelNode(fontNamed: UIFont.systemFont(ofSize: 17, weight: .bold).fontName)
+    let stepLabel  = SKLabelNode(fontNamed: UIFont.systemFont(ofSize: 17, weight: .bold).fontName)
+    let distanceLabel = SKLabelNode(fontNamed: UIFont.systemFont(ofSize: 17, weight: .bold).fontName)
     let bottomToolbar = SKNode()
 
     // MARK: - CONFIG
